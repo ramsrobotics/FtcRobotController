@@ -141,6 +141,7 @@ public abstract class CCHardwareBot {
      * sensors on the robot.
      */
     private BoKHardwareStatus initMotorsAndSensors() {
+        /*
         //Motors
         liftLeftMotor = opMode.hardwareMap.dcMotor.get(LIFT_LEFT_MOTOR_NAME);
         if(liftLeftMotor == null){
@@ -270,11 +271,12 @@ public abstract class CCHardwareBot {
             // initialization
         }
 
-         */
+         end comment here
         imu = opMode.hardwareMap.get(BNO055IMU.class, IMU_TOP);
         if (imu == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
+        */
         return BoKHardwareStatus.BOK_HARDWARE_SUCCESS;
     }
 

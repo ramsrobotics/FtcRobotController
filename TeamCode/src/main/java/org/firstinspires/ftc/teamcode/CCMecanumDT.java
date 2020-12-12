@@ -68,7 +68,7 @@ public class CCMecanumDT extends CCHardwareBot {
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE );
         // Drive train is initialized, initialize sensors
         return BoKHardwareStatus.BOK_HARDWARE_SUCCESS;
     }

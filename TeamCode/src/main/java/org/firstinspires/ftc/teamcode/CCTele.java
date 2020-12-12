@@ -34,22 +34,22 @@ public class CCTele {
         this.opMode = opMode;
         this.robot = robot;
         robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+/*
         robot.liftLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.liftRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.liftLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         robot.liftLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.liftRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        robot.capStoneServo.setPosition(robot.CAP_HOLD);
-        robot.foundationGripServo.setPosition(robot.FOUNDATION_GRIP_DOWN);
+*/
+     //   robot.capStoneServo.setPosition(robot.CAP_HOLD);
+       // robot.foundationGripServo.setPosition(robot.FOUNDATION_GRIP_DOWN);
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
 
     public BoKTeleStatus runSoftware() {
 
-        robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN + 0.08);
-        robot.autoGripRight.setPosition(robot.AUTO_GRAB);
+   //     robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN + 0.08);
+     //   robot.autoGripRight.setPosition(robot.AUTO_GRAB);
         // run until the end of the match (driver presses STOP)
         while (opMode.opModeIsActive()) {
             // GAMEPAD 1 CONTROLS:
@@ -58,7 +58,7 @@ public class CCTele {
             // Y:                  Go in slow mode
 
             moveRobot();
-
+/*
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
                 robot.flickerServo.setPosition(robot.FLICKER_INIT);
@@ -297,7 +297,7 @@ public class CCTele {
                 robot.gripperRotateLeftServo.setPosition(robot.ROTATE_MID_LEFT_POS);
                 counter = 0;
             }
-
+*/
             opMode.telemetry.update();
         }
         return BoKTeleStatus.BOK_TELE_SUCCESS;
