@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.vuforia.Box3D;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -25,92 +26,37 @@ public abstract class CCHardwareBot {
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
     protected static final int WAIT_PERIOD = 40; // 40 ms
     //Motors
-    private static final String LIFT_LEFT_MOTOR_NAME = "llM";
-    private static final String LIFT_RIGHT_MOTOR_NAME = "lrM";
-    private static final String INTAKE_LEFT_MOTOR_NAME = "ilM";
-    private static final String INTAKE_RIGHT_MOTOR_NAME = "irM";
+   private static final String WOBBLE_GOAL_ARM = "wbA";
+   private static final String FRONT_INTAKE_MOTOR = "fiM";
+   private static final String SHOOTER_MOTOR = "shM";
+   private static final String VERTICAL_INTAKE_MOTOR = "viM";
     //Servos
-    private static final String GRIPPER_ROTATE_LEFT_SERVO_NAME = "glS";
-    private static final String GRIPPER_ROTATE_RIGHT_SERVO_NAME = "grS";
-    private static final String GRIPPER_SERVO_NAME = "giS";
-    private static final String FOUNDATION_GRIP_SERVO = "fgS";
-    private static final String BLOCK_FLICKER= "bfS";
-    private static final String CAP_SERVO = "caS";
-    private static final String LEFT_AUTO_GRAB = "laG";
-    private static final String LEFT_AUTO_ROT = "laR";
-    private static final String RIGHT_AUTO_GRAB = "raG";
-    private static final String RIGHT_AUTO_ROT = "raR";
+    private static final String SHOOTER_SERVO = "shS";
+    private static final String BOX_FLICKER_SERVO = "bfS";
+    private static final String BOX_SERVO = "boS";
+    private static final String WOBBLE_CLAW_SERVO = "wbS";
     //Sensors
     private static final String IMU_TOP = "imu";        // IMU
     private static final String DISTANCE_SENSOR_BACK = "dsB";
     private static final String DISTANCE_SENSOR_FRONT = "dsF";
-    private static final String DISTANCE_SENSOR_RIGHT = "dsR";
-    private static final String DISTANCE_SENSOR_LEFT = " dsL";
-    private static final String ODS_BLOCK = "odS";
-    protected final double INTAKE_GRAB_POS = 0.83;//0.65
-    protected final double INTAKE_MID_POS = 0.4;
-    protected final double INTAKE_RELEASE_POS = .96;
 
-    protected final double INTAKE_POWER = 1;
-    protected final double REVERSE_POWER = 0.4;
+    protected DcMotor wobbleGoalArm;
+    protected DcMotor frontIntake;
+    protected DcMotor shooter;
+    protected DcMotor verticalIntake;
 
-    protected final double ORI_DOWN = 0;//0.2
-    protected final double ORI_MID = 0.33;//
-    protected final double ORI_UP = 0.7;
-
-    protected final double ROTATE_UP_POS_LEFT = 0.56;
-    protected final double ROTATE_DOWN_LEFT_POS = 0.86;
-    protected final double ROTATE_GRIP_LEFT_POS = 0.94;
-    protected final double ROTATE_MID_LEFT_POS = 0.77;
-
-
-    protected final double ROTATE_UP_POS = 0.44;
-    protected final double ROTATE_DOWN_POS = 0.14;
-    protected final double ROTATE_GRIP_POS = 0.06;
-    protected final double ROTATE_MID_POS = 0.23;
-
-
-    protected final double FOUNDATION_GRIP_DOWN = 1;
-    protected final double FOUNDATION_GRIP_UP = .8;
-    protected final double FOUNDATION_GRIP_INIT = 0;
-
-    protected final double FLICKER_INIT = 0.5;
-    protected final double FLICKER_SET = .9;
-
-
-
-    protected final double AUTO_GRAB = 0;
-    protected final double AUTO_OPEN = 0.7;
-
-    protected final double AUTO_RIGHTI_IN = 0.35;
-    protected final double AUTO_RIGHT_DEPLOY = 0.75;
-
-    protected final double CAP_HOLD = 1;
-    protected final double CAP_DROP = .45;
-    // DC motors
-    protected DcMotor liftLeftMotor;
-    protected DcMotor liftRightMotor;
-    protected DcMotor intakeLeftMotor;
-    protected DcMotor intakeRightMotor;
-    // Servos
-    protected Servo gripperRotateLeftServo;
-    protected Servo gripperRotateRightServo;
-    protected Servo gripperOrientationServo;
-    protected Servo gripperServo;
-    protected Servo foundationGripServo;
-    protected Servo flickerServo;
-    protected Servo capStoneServo;
-    protected Servo autoGripLeft;
-    protected Servo autoGripRight;
-    protected Servo autoROTLeft;
-    protected Servo autoROTRight;
+    protected Servo shooterServo;
+    protected Servo boxFlickerServo;
+    protected Servo boxServo;
+    protected Servo wobbleClaw;
 
     // Sensors
     protected BNO055IMU imu;
-    protected AnalogInput distanceLeft;
-    protected AnalogInput distanceBack;
+
     protected AnalogInput distanceForward;
     protected AnalogInput distanceRight;
+    protected AnalogInput distanceBack;
+    protected AnalogInput distanceLeft;
     protected OpticalDistanceSensor opticalDistanceSensor;
     LinearOpMode opMode; // current opMode
     private Orientation angles;
@@ -141,7 +87,42 @@ public abstract class CCHardwareBot {
      * sensors on the robot.
      */
     private BoKHardwareStatus initMotorsAndSensors() {
-        /*
+        //Motors
+        wobbleGoalArm = opMode.hardwareMap.dcMotor.get(WOBBLE_GOAL_ARM);
+        if(wobbleGoalArm == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        frontIntake = opMode.hardwareMap.dcMotor.get(FRONT_INTAKE_MOTOR);
+        if(frontIntake == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        shooter = opMode.hardwareMap.dcMotor.get(SHOOTER_MOTOR);
+        if(shooter == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        verticalIntake = opMode.hardwareMap.dcMotor.get(VERTICAL_INTAKE_MOTOR);
+        if(verticalIntake == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+
+        //Servos;
+        shooterServo = opMode.hardwareMap.servo.get(SHOOTER_SERVO);
+        if(shooterServo == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        boxFlickerServo = opMode.hardwareMap.servo.get(BOX_FLICKER_SERVO);
+        if(boxFlickerServo == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        boxServo = opMode.hardwareMap.servo.get(BOX_SERVO);
+        if(boxServo == null) {
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        wobbleClaw = opMode.hardwareMap.servo.get(WOBBLE_CLAW_SERVO);
+        if(wobbleClaw == null) {
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        shooterServo.setPosition(0.5);/*
         //Motors
         liftLeftMotor = opMode.hardwareMap.dcMotor.get(LIFT_LEFT_MOTOR_NAME);
         if(liftLeftMotor == null){
@@ -255,6 +236,7 @@ public abstract class CCHardwareBot {
 
     */
 
+
         //Dc Motor Init
       //  liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
        // liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -277,6 +259,8 @@ public abstract class CCHardwareBot {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
         */
+       // wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       // wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         return BoKHardwareStatus.BOK_HARDWARE_SUCCESS;
     }
 

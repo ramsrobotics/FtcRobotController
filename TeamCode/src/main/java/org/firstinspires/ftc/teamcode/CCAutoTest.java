@@ -12,8 +12,8 @@ public class CCAutoTest extends CCAutoCommon {
             opMode.sleep(500);
 
             while (opMode.opModeIsActive() && !opMode.gamepad1.x) {
-                robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY);
-                robot.autoGripRight.setPosition(robot.AUTO_GRAB);
+               // robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY);
+              //  robot.autoGripRight.setPosition(robot.AUTO_GRAB);
                // robot.autoTopServo.setPosition(robot.AUTO_TOP_INIT);
                 //robot.autoBotServo.setPosition(0.6);
                 double distLB = robot.getDistanceCM(robot.distanceLeft, 250, 2, opMode);

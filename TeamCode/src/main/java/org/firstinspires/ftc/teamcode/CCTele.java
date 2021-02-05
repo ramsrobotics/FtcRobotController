@@ -58,15 +58,25 @@ public class CCTele {
             // Y:                  Go in slow mode
 
             moveRobot();
-/*
+
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
-                robot.flickerServo.setPosition(robot.FLICKER_INIT);
                 counter = 0;
             }
             if (opMode.gamepad1.a) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
             }
+            if(opMode.gamepad2.a){
+                robot.shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.shooter.setPower(-1);
+            }
+            if(opMode.gamepad2.left_stick_y > 0){
+                robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
+            }
+            if(opMode.gamepad2.left_stick_y < 0){
+                robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
+            }
+            /*
             if(opMode.gamepad1.right_bumper){
                 robot.capStoneServo.setPosition(robot.CAP_DROP);
             }

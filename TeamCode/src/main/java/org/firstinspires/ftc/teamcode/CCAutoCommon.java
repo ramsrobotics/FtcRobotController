@@ -949,7 +949,7 @@ public abstract class CCAutoCommon implements CCAuto {
         }
         Log.v("BOK", "moveWithRangeSensorBack: " + cmCurrent);
     }
-
+/*
     protected void resetLift(double waitForSec) {
         boolean reset = true;
         runTime.reset();
@@ -1231,7 +1231,7 @@ public abstract class CCAutoCommon implements CCAuto {
             // back range sensor
             if(!movingForward) {
                 if ((diffFromTarget < 0 || forward)) { // we are still far away!
-                    robot.setPowerToDTMotors(Math.abs(wheelPower), false /* going back*/);
+                    robot.setPowerToDTMotors(Math.abs(wheelPower), false /* going back);
                 }
                 if(diffFromTarget > 0 && !forward){
                     robot.setPowerToDTMotors(Math.abs(wheelPower), false);
@@ -1240,7 +1240,7 @@ public abstract class CCAutoCommon implements CCAuto {
             }
             else if (movingForward) {
                 // if diffFromTarget > 0 then wheelPower is +ve
-                robot.setPowerToDTMotors(Math.abs(wheelPower), true /* going forward */);
+                robot.setPowerToDTMotors(Math.abs(wheelPower), true /* going forward );
             }
             //Log.v("BOK", "Back current RS: " + cmCurrent +
             //        " Difference: " + diffFromTarget +
@@ -1253,7 +1253,7 @@ public abstract class CCAutoCommon implements CCAuto {
         }
         Log.v("BOK", "Sensor 1: " + cmCurrentOne);
     }
-
+*/
     /**
      * dumpMarker
      * Dumps the marker by moving the marker servo.
@@ -1359,7 +1359,7 @@ public abstract class CCAutoCommon implements CCAuto {
      * Route Away from Mid
      */
     protected void runAuto(boolean inside, boolean startStone, boolean park) {
-        robot.foundationGripServo.setPosition(robot.FOUNDATION_GRIP_UP);
+      //  robot.foundationGripServo.setPosition(robot.FOUNDATION_GRIP_UP);
         CCAutoStoneLocation loc = CCAutoStoneLocation.CC_CUBE_UNKNOWN;
         Log.v("BOK", "Angle at runAuto start " +
                 robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
@@ -1381,7 +1381,7 @@ public abstract class CCAutoCommon implements CCAuto {
         //move to position
         if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE){
 
-            robot.autoGripRight.setPosition(robot.AUTO_OPEN);
+         //   robot.autoGripRight.setPosition(robot.AUTO_OPEN);
             arcTurn(-0.5, .14, 12.5, 0, 78, 4);
             opMode.sleep(250);
             strafeWithRange(0.7, 29, 50, robot.distanceLeft, 2, 1, false);
@@ -1390,12 +1390,12 @@ public abstract class CCAutoCommon implements CCAuto {
                     AngleUnit.DEGREES).thirdAngle), 90, DT_TURN_THRESHOLD_LOW, false, false, 2);
             move(0.3, 0.3, 13, false, 2);
           //  moveWithRangeSensorBack(0.3, 30, 100, 3, robot.distanceBack, false, RS_DIFF_THRESHOLD_CM_LOW);
-            robot.autoGripRight.setPosition(robot.AUTO_OPEN);
-            robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY);
-            opMode.sleep(500);
-            robot.autoGripRight.setPosition(robot.AUTO_GRAB);
+       //     robot.autoGripRight.setPosition(robot.AUTO_OPEN);
+         //   robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY);
+           // opMode.sleep(500);
+            //robot.autoGripRight.setPosition(robot.AUTO_GRAB);
             opMode.sleep(250);
-            robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN);
+            //robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN);
             opMode.sleep(250);
             strafeWithRange(0.7, 28, 50, robot.distanceLeft, 2, 1, false);
             followHeadingPID(90, 0.2, 64, false, 4, true);
@@ -1404,12 +1404,12 @@ public abstract class CCAutoCommon implements CCAuto {
                     AxesOrder.XYZ,
                     AngleUnit.DEGREES).thirdAngle, 90, DT_TURN_THRESHOLD_LOW, false, false, 3);
 
-            robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY-0.05);
+        //    robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY-0.05);
             opMode.sleep(500);
-            robot.autoGripRight.setPosition(robot.AUTO_OPEN);
+          //  robot.autoGripRight.setPosition(robot.AUTO_OPEN);
             opMode.sleep(250);
-            robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN);
-            robot.autoGripRight.setPosition(robot.AUTO_GRAB);
+            //robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN);
+            //robot.autoGripRight.setPosition(robot.AUTO_GRAB);
 
 
             //strafeWithRange(0.7, 20, 100, robot.distanceLeft, 4, 1, false);
