@@ -25,6 +25,15 @@ public abstract class CCHardwareBot {
 
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
     protected static final int WAIT_PERIOD = 40; // 40 ms
+
+    protected final double BOX_UP = 1.0;
+    protected final double BOX_DOWN = 0.7;
+
+    protected final double FLICKER_OUT = 1.0;
+    protected final double FLICKER_IN = 0.7;
+
+    protected final double WOBBLE_GRIP = 1.0;
+    protected final double WOBBLE_RELEASE = 0.7;
     //Motors
    private static final String WOBBLE_GOAL_ARM = "wbA";
    private static final String FRONT_INTAKE_MOTOR = "fiM";
@@ -123,103 +132,6 @@ public abstract class CCHardwareBot {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
         shooterServo.setPosition(0.5);/*
-        //Motors
-        liftLeftMotor = opMode.hardwareMap.dcMotor.get(LIFT_LEFT_MOTOR_NAME);
-        if(liftLeftMotor == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        liftRightMotor = opMode.hardwareMap.dcMotor.get(LIFT_RIGHT_MOTOR_NAME);
-        if(liftRightMotor == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        intakeLeftMotor = opMode.hardwareMap.dcMotor.get(INTAKE_LEFT_MOTOR_NAME);
-        if(intakeLeftMotor == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        intakeRightMotor = opMode.hardwareMap.dcMotor.get(INTAKE_RIGHT_MOTOR_NAME);
-        if(intakeRightMotor == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        //Servos
-        gripperRotateLeftServo = opMode.hardwareMap.servo.get(GRIPPER_ROTATE_LEFT_SERVO_NAME);
-        if (gripperRotateLeftServo == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        gripperRotateRightServo = opMode.hardwareMap.servo.get(GRIPPER_ROTATE_RIGHT_SERVO_NAME);
-        if(gripperRotateRightServo == null){
-            return  BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-
-        gripperServo = opMode.hardwareMap.servo.get(GRIPPER_SERVO_NAME);
-        if(gripperServo == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        foundationGripServo = opMode.hardwareMap.servo.get(FOUNDATION_GRIP_SERVO);
-        if(foundationGripServo == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        distanceForward = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_FRONT);
-        if(distanceForward == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        distanceLeft = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_LEFT);
-        if(distanceLeft == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        distanceBack = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_BACK);
-        if(distanceBack == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        distanceRight = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_RIGHT);
-        if(distanceRight == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        opticalDistanceSensor = opMode.hardwareMap.opticalDistanceSensor.get(ODS_BLOCK);
-        if(opticalDistanceSensor == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        flickerServo = opMode.hardwareMap.servo.get(BLOCK_FLICKER);
-        if(opticalDistanceSensor == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        capStoneServo = opMode.hardwareMap.servo.get(CAP_SERVO);
-        if(capStoneServo == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        autoGripRight = opMode.hardwareMap.servo.get(RIGHT_AUTO_GRAB);
-        if(autoGripRight == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        autoROTRight = opMode.hardwareMap.servo.get((RIGHT_AUTO_ROT));
-        if(autoROTRight == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-      /*  //Motors
-        liftMotor = opMode.hardwareMap.dcMotor.get(LIFT_MOTOR_NAME);
-        if (liftMotor == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        //Servos
-        inRotateServo = opMode.hardwareMap.servo.get(INTAKE_ROTATE_SERVO_NAME);
-        if (inRotateServo == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        intakeServo = opMode.hardwareMap.servo.get(INTAKE_SERVO_NAME);
-        if (intakeServo == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        foundationGripServo = opMode.hardwareMap.servo.get(FOUNDATION_GRIP_SERVO);
-        if (liftMotor == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
 
         //Sensors
 

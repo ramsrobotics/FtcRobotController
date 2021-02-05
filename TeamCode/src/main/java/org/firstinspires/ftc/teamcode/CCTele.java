@@ -70,12 +70,52 @@ public class CCTele {
                 robot.shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.shooter.setPower(-1);
             }
-            if(opMode.gamepad2.left_stick_y > 0){
-                robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
+            if(opMode.gamepad2.b){
+                robot.shooter.setPower(0);
             }
-            if(opMode.gamepad2.left_stick_y < 0){
+            if(opMode.gamepad2.x){
+                robot.frontIntake.setPower(-1);
+                robot.verticalIntake.setPower(-1);
+            }
+            if(opMode.gamepad2.y){
+                robot.frontIntake.setPower(1);
+                robot.verticalIntake.setPower(1);
+            }
+            if(opMode.gamepad2.dpad_up){
+                robot.boxServo.setPosition(robot.BOX_UP);
+            }
+            if(opMode.gamepad2.dpad_down){
+                robot.boxServo.setPosition(robot.BOX_DOWN);
+            }
+            if(opMode.gamepad2.dpad_left){
+                robot.boxFlickerServo.setPosition(robot.FLICKER_OUT);
+            }
+            if(opMode.gamepad2.dpad_right){
+                robot.boxFlickerServo.setPosition(robot.FLICKER_IN);
+            }
+            if(opMode.gamepad2.right_stick_y > 0){
+                robot.wobbleGoalArm.setTargetPosition(robot.wobbleGoalArm.getCurrentPosition() + 2);
+                robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            if(opMode.gamepad2.right_stick_y < 0){
+                robot.wobbleGoalArm.setTargetPosition(robot.wobbleGoalArm.getCurrentPosition() - 2);
+                robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            if(opMode.gamepad2.right_bumper){
+                robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
+            }
+            if(opMode.gamepad2.left_bumper) {
+                robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            }
+
+
+            if(opMode.gamepad2.left_stick_y > 0){
                 robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
             }
+            if(opMode.gamepad2.left_stick_y < 0){
+                robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
+            }
+
             /*
             if(opMode.gamepad1.right_bumper){
                 robot.capStoneServo.setPosition(robot.CAP_DROP);
