@@ -93,7 +93,7 @@ public abstract class CCAutoCommon implements CCAuto {
     protected CCAutoOpMode opMode;  // save a copy of the current opMode and robot
     protected CCHardwareBot robot;
     protected Orientation angles;
-    private int YELLOW_PERCENT = 80;
+    private int YELLOW_PERCENT = 60;
     private AppUtil appUtil = AppUtil.getInstance();
     private VuforiaLocalizer vuforiaFTC;
     protected boolean noStone = true;
@@ -387,7 +387,7 @@ public abstract class CCAutoCommon implements CCAuto {
      * @param roi
      * @return
      */
-    private boolean isSkystone(Mat imgHSV, Rect roi) {
+    private boolean areRingsThere(Mat imgHSV, Rect roi) {
         Mat hist = new Mat();
         MatOfInt histSize = new MatOfInt(180);
         MatOfFloat ranges = new MatOfFloat(0f, 180f);
@@ -427,7 +427,7 @@ public abstract class CCAutoCommon implements CCAuto {
         int numPixels = roi.width * roi.height;
         // Red is 0 (in HSV),
         // but we need to check between 10 and 35
-        for (p = 10; p < 40; p++) {
+        for (p = 10; p < 50; p++) {
             nYellowPixels += (int) resFloat[p];
         }
 
@@ -456,9 +456,9 @@ public abstract class CCAutoCommon implements CCAuto {
      * @return
      */
 
-    protected CCAutoStoneLocation findCube() {
+    protected CCAutoRingsLocation findRings() {
         int numYellow = 0;
-        CCAutoStoneLocation ret = CCAutoStoneLocation.CC_CUBE_RIGHT;
+        CCAutoRingsLocation ret = CCAutoRingsLocation.CC_CUBE_RIGHT;
         VuforiaLocalizer.CloseableFrame frame;
 
         // takes the frame at the head of the queue
@@ -487,17 +487,17 @@ public abstract class CCAutoCommon implements CCAuto {
                         Rect LeftRoi = new Rect(new Point(400, 650), s);
                         Rect CenterRoi = new Rect(new Point(400, 500), s);
                         Rect RightRoi = new Rect(new Point(400, 100), s);
-                        boolean left = isSkystone(srcHSV, LeftRoi);
-                        boolean center = isSkystone(srcHSV, CenterRoi);
-                        boolean right = isSkystone(srcHSV, RightRoi);
+                        boolean left = areRingsThere(srcHSV, LeftRoi);
+                        boolean center = areRingsThere(srcHSV, CenterRoi);
+                        boolean right = areRingsThere(srcHSV, RightRoi);
                         if ((!left && center && right) || (!left && !center && right)) {// note to self:THIS IS A WORK AROUND MAY NOT WORK
-                            ret = CCAutoStoneLocation.CC_CUBE_LEFT;
+                            ret = CCAutoRingsLocation.CC_CUBE_LEFT;
                         }
                         if (!center && left && right) {
-                            ret = CCAutoStoneLocation.CC_CUBE_CENTER;
+                            ret = CCAutoRingsLocation.CC_CUBE_CENTER;
                         }
                         if (!right && left && center) {
-                            ret = CCAutoStoneLocation.CC_CUBE_RIGHT;
+                            ret = CCAutoRingsLocation.CC_CUBE_RIGHT;
                         }
                         /*
                         if (center && left) {
@@ -518,17 +518,17 @@ public abstract class CCAutoCommon implements CCAuto {
                         Rect LeftRoi = new Rect(new Point(400, 600), s);
                         Rect CenterRoi = new Rect(new Point(400, 400), s);
                         Rect RightRoi = new Rect(new Point(400, 150), s);
-                        boolean left = isSkystone(srcHSV, LeftRoi);
-                        boolean center = isSkystone(srcHSV, CenterRoi);
-                        boolean right = isSkystone(srcHSV, RightRoi);
+                        boolean left = areRingsThere(srcHSV, LeftRoi);
+                        boolean center = areRingsThere(srcHSV, CenterRoi);
+                        boolean right = areRingsThere(srcHSV, RightRoi);
                         if ((!left && center && right) || (!left && !center && right)) {// note to self:THIS IS A WORK AROUND MAY NOT WORK
-                            ret = CCAutoStoneLocation.CC_CUBE_LEFT;
+                            ret = CCAutoRingsLocation.CC_CUBE_LEFT;
                         }
                         if ((!center && left && right) || (!center && left && !right)) {
-                            ret = CCAutoStoneLocation.CC_CUBE_CENTER;
+                            ret = CCAutoRingsLocation.CC_CUBE_CENTER;
                         }
                         if (!right && left && center) {
-                            ret = CCAutoStoneLocation.CC_CUBE_RIGHT;
+                            ret = CCAutoRingsLocation.CC_CUBE_RIGHT;
                         }
                         writeFile(VUFORIA_ROI_IMG, srcHSV, true);
                         Log.v("BOK", "Left: " + left +
@@ -1360,7 +1360,7 @@ public abstract class CCAutoCommon implements CCAuto {
      */
     protected void runAuto(boolean inside, boolean startStone, boolean park) {
       //  robot.foundationGripServo.setPosition(robot.FOUNDATION_GRIP_UP);
-        CCAutoStoneLocation loc = CCAutoStoneLocation.CC_CUBE_UNKNOWN;
+        CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
         Log.v("BOK", "Angle at runAuto start " +
                 robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
@@ -1368,7 +1368,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
         // Step 1: find skystone location
         try {
-            loc = findCube();
+            loc = findRings();
         } catch (java.lang.Exception e) {
             Log.v("BOK", "Exception at findCube()");
         }
@@ -1377,7 +1377,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
         Log.v("BOK", "Color: " + allianceColor + " Inside Route: " +
                 inside + " Stating At Stone: " + startStone);
-        runTime.reset();
+      /*  runTime.reset();
         //move to position
         if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE){
 
@@ -1418,13 +1418,15 @@ public abstract class CCAutoCommon implements CCAuto {
 
         }
 
+       */
+
 
     }
-        public enum CCAutoStoneLocation {
-            CC_CUBE_UNKNOWN,
-            CC_CUBE_LEFT,
-            CC_CUBE_CENTER,
-            CC_CUBE_RIGHT
+        public enum CCAutoRingsLocation {
+            CC_RING_UNKNOWN,
+            CC_RING_BACK,
+            CC_RING_MID,
+            CC_RING_FRONT
         }
 
 }

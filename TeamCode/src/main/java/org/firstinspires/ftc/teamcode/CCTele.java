@@ -17,14 +17,6 @@ public class CCTele {
     private CCHardwareBot robot;
     private LinearOpMode opMode;
     private double speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
-    private boolean end_game = false;
-    private boolean isLiftingIntakeArm = true;
-    private boolean hasMovedIntakeArm = false;
-    private boolean intServo = false;
-    private boolean intGripServo = false;
-    private boolean servoGate = true;
-    private boolean resetLift = false;
-    private boolean armDone = false;
     int counter = 0;
     boolean next = false;
 
@@ -73,14 +65,7 @@ public class CCTele {
             if(opMode.gamepad2.b){
                 robot.shooter.setPower(0);
             }
-            if(opMode.gamepad2.x){
-                robot.frontIntake.setPower(-1);
-                robot.verticalIntake.setPower(-1);
-            }
-            if(opMode.gamepad2.y){
-                robot.frontIntake.setPower(1);
-                robot.verticalIntake.setPower(1);
-            }
+
             if(opMode.gamepad2.dpad_up){
                 robot.boxServo.setPosition(robot.BOX_UP);
             }
@@ -93,13 +78,19 @@ public class CCTele {
             if(opMode.gamepad2.dpad_right){
                 robot.boxFlickerServo.setPosition(robot.FLICKER_IN);
             }
-            if(opMode.gamepad2.right_stick_y > 0){
-                robot.wobbleGoalArm.setTargetPosition(robot.wobbleGoalArm.getCurrentPosition() + 2);
+
+
+            if(opMode.gamepad2.y){
+                robot.wobbleGoalArm.setPower(-0.5);
+                robot.wobbleGoalArm.setTargetPosition(350);
                 robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             }
-            if(opMode.gamepad2.right_stick_y < 0){
-                robot.wobbleGoalArm.setTargetPosition(robot.wobbleGoalArm.getCurrentPosition() - 2);
+            if(opMode.gamepad2.x){
+                robot.wobbleGoalArm.setPower(0.5);
+                robot.wobbleGoalArm.setTargetPosition(150);
                 robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             }
             if(opMode.gamepad2.right_bumper){
                 robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
@@ -109,12 +100,34 @@ public class CCTele {
             }
 
 
-            if(opMode.gamepad2.left_stick_y > 0){
+            if(opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
                 robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
+                Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
-            if(opMode.gamepad2.left_stick_y < 0){
+            if(opMode.gamepad2.left_stick_y < -GAME_TRIGGER_DEAD_ZONE){
                 robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
+                Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
+            if(opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE){
+                robot.shooterServo.setPosition(0.694);
+            }
+            if(opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE){
+                robot.boxServo.setPosition(robot.BOX_UP);
+                robot.boxFlickerServo.setPosition(robot.FLICKER_OUT);
+              //  robot.boxFlickerServo.setPosition(robot.FLICKER_IN);//maybe
+            }
+            if(opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE){
+                robot.frontIntake.setPower(1);
+                robot.verticalIntake.setPower(1);
+                robot.shooter.setPower(0);
+            }
+            if(opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE){
+                robot.frontIntake.setPower(-1);
+                robot.verticalIntake.setPower(-1);
+                robot.shooter.setPower(0);
+            }
+            robot.frontIntake.setPower(0);
+            robot.verticalIntake.setPower(0);
 
             /*
             if(opMode.gamepad1.right_bumper){

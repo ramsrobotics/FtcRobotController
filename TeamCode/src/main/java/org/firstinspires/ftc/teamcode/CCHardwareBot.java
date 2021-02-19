@@ -27,13 +27,13 @@ public abstract class CCHardwareBot {
     protected static final int WAIT_PERIOD = 40; // 40 ms
 
     protected final double BOX_UP = 1.0;
-    protected final double BOX_DOWN = 0.7;
+    protected final double BOX_DOWN = 0.65;
 
-    protected final double FLICKER_OUT = 1.0;
-    protected final double FLICKER_IN = 0.7;
+    protected final double FLICKER_OUT = 0.43;
+    protected final double FLICKER_IN = 0.03;
 
-    protected final double WOBBLE_GRIP = 1.0;
-    protected final double WOBBLE_RELEASE = 0.7;
+    protected final double WOBBLE_GRIP = 0;
+    protected final double WOBBLE_RELEASE = 0.3;
     //Motors
    private static final String WOBBLE_GOAL_ARM = "wbA";
    private static final String FRONT_INTAKE_MOTOR = "fiM";
@@ -45,7 +45,7 @@ public abstract class CCHardwareBot {
     private static final String BOX_SERVO = "boS";
     private static final String WOBBLE_CLAW_SERVO = "wbS";
     //Sensors
-    private static final String IMU_TOP = "imu";        // IMU
+    private static final String IMU_TOP = "imu_top";        // IMU
     private static final String DISTANCE_SENSOR_BACK = "dsB";
     private static final String DISTANCE_SENSOR_FRONT = "dsF";
 
@@ -131,8 +131,10 @@ public abstract class CCHardwareBot {
         if(wobbleClaw == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        shooterServo.setPosition(0.5);/*
 
+        wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+/*
         //Sensors
 
 
@@ -165,12 +167,12 @@ public abstract class CCHardwareBot {
             // initialization
         }
 
-         end comment here
+         end comment here*/
         imu = opMode.hardwareMap.get(BNO055IMU.class, IMU_TOP);
         if (imu == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        */
+
        // wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
        // wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         return BoKHardwareStatus.BOK_HARDWARE_SUCCESS;
