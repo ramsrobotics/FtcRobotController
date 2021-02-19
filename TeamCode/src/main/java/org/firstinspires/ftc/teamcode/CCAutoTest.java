@@ -16,18 +16,16 @@ public class CCAutoTest extends CCAutoCommon {
               //  robot.autoGripRight.setPosition(robot.AUTO_GRAB);
                // robot.autoTopServo.setPosition(robot.AUTO_TOP_INIT);
                 //robot.autoBotServo.setPosition(0.6);
-                double distLB = robot.getDistanceCM(robot.distanceLeft, 250, 2, opMode);
+
                // robot.distanceLeftBack.close();
                 double distLF = robot.getDistanceCM(robot.distanceForward, 250, 2, opMode);
               //  robot.distanceLeftForward.close();
                 double distRB = robot.getDistanceCM(robot.distanceBack, 250 , 2, opMode);
-                double distRF = robot.getDistanceCM(robot.distanceRight, 250, 2 , opMode);
-                double distB = robot.opticalDistanceSensor.getLightDetected();
-                opMode.telemetry.addData("Distance Left: ", distLB);
+
+
                 opMode.telemetry.addData("Distance For: ", distLF);
                 opMode.telemetry.addData("Distance Back: ", distRB);
-                opMode.telemetry.addData("Distance Right: ", distRF);
-                opMode.telemetry.addData("ODS: ", distB);
+
                 opMode.telemetry.update();
             }
             opMode.sleep(500);

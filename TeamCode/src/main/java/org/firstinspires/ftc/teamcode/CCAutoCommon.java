@@ -458,7 +458,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
     protected CCAutoRingsLocation findRings() {
         int numYellow = 0;
-        CCAutoRingsLocation ret = CCAutoRingsLocation.CC_CUBE_RIGHT;
+        CCAutoRingsLocation ret = CCAutoRingsLocation.CC_RING_FRONT;
         VuforiaLocalizer.CloseableFrame frame;
 
         // takes the frame at the head of the queue
@@ -484,21 +484,23 @@ public abstract class CCAutoCommon implements CCAuto {
                     Size s = new Size(50, 50);
 
                     if (allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED) {
-                        Rect LeftRoi = new Rect(new Point(400, 650), s);
-                        Rect CenterRoi = new Rect(new Point(400, 500), s);
-                        Rect RightRoi = new Rect(new Point(400, 100), s);
-                        boolean left = areRingsThere(srcHSV, LeftRoi);
-                        boolean center = areRingsThere(srcHSV, CenterRoi);
-                        boolean right = areRingsThere(srcHSV, RightRoi);
-                        if ((!left && center && right) || (!left && !center && right)) {// note to self:THIS IS A WORK AROUND MAY NOT WORK
-                            ret = CCAutoRingsLocation.CC_CUBE_LEFT;
+
+
+                        Rect TopRoi = new Rect(new Point(346, 235), new Point(376, 145));
+                        Rect BotRoi = new Rect(new Point(400, 230), new Point(376, 145));
+                        boolean top = areRingsThere(srcHSV, TopRoi);
+                        boolean bot = areRingsThere(srcHSV, BotRoi);
+
+                        if(top && bot){
+                            ret = CCAutoRingsLocation.CC_RING_BACK;
                         }
-                        if (!center && left && right) {
-                            ret = CCAutoRingsLocation.CC_CUBE_CENTER;
+                        if(!top && bot){
+                            ret = CCAutoRingsLocation.CC_RING_MID;
                         }
-                        if (!right && left && center) {
-                            ret = CCAutoRingsLocation.CC_CUBE_RIGHT;
+                        if(!top && !bot){
+                            ret = CCAutoRingsLocation.CC_RING_FRONT;
                         }
+
                         /*
                         if (center && left) {
                             ret = CCAutoStoneLocation.CC_CUBE_RIGHT;
@@ -511,29 +513,10 @@ public abstract class CCAutoCommon implements CCAuto {
                         }
                         */
                         writeFile(VUFORIA_ROI_IMG, srcHSV, true);
-                        Log.v("BOK", "Left: " + left +
-                                " Center: " + center + " Right: " + right);
+                        Log.v("BOK", "Top: " + top +
+                                " Bot: " + bot);
                     }
-                    if (BoKAllianceColor.BOK_ALLIANCE_BLUE == allianceColor) {
-                        Rect LeftRoi = new Rect(new Point(400, 600), s);
-                        Rect CenterRoi = new Rect(new Point(400, 400), s);
-                        Rect RightRoi = new Rect(new Point(400, 150), s);
-                        boolean left = areRingsThere(srcHSV, LeftRoi);
-                        boolean center = areRingsThere(srcHSV, CenterRoi);
-                        boolean right = areRingsThere(srcHSV, RightRoi);
-                        if ((!left && center && right) || (!left && !center && right)) {// note to self:THIS IS A WORK AROUND MAY NOT WORK
-                            ret = CCAutoRingsLocation.CC_CUBE_LEFT;
-                        }
-                        if ((!center && left && right) || (!center && left && !right)) {
-                            ret = CCAutoRingsLocation.CC_CUBE_CENTER;
-                        }
-                        if (!right && left && center) {
-                            ret = CCAutoRingsLocation.CC_CUBE_RIGHT;
-                        }
-                        writeFile(VUFORIA_ROI_IMG, srcHSV, true);
-                        Log.v("BOK", "Left: " + left +
-                                " Center: " + center + " Right: " + right);
-                    }
+
 
 
                 }

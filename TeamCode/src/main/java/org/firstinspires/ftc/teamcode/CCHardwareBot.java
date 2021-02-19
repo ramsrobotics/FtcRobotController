@@ -63,10 +63,10 @@ public abstract class CCHardwareBot {
     protected BNO055IMU imu;
 
     protected AnalogInput distanceForward;
-    protected AnalogInput distanceRight;
+
     protected AnalogInput distanceBack;
-    protected AnalogInput distanceLeft;
-    protected OpticalDistanceSensor opticalDistanceSensor;
+
+
     LinearOpMode opMode; // current opMode
     private Orientation angles;
 
@@ -134,7 +134,7 @@ public abstract class CCHardwareBot {
 
         wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-/*
+
         //Sensors
 
 
@@ -148,7 +148,7 @@ public abstract class CCHardwareBot {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
 
-    */
+
 
 
         //Dc Motor Init
