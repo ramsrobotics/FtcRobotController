@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -172,6 +174,7 @@ public abstract class CCHardwareBot {
         if (imu == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
+        wobbleClaw.setPosition(WOBBLE_GRIP);
 
        // wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
        // wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -283,13 +286,14 @@ public abstract class CCHardwareBot {
      */
     protected double getDistanceCM(AnalogInput mb1240, double target, double time, CCAutoOpMode opMode) {
         runTime.reset();
-        double dist = (mb1240.getVoltage() / 0.003222);
+        double dist = 5*(mb1240.getVoltage()/3.2222) * 25.4;
+        Log.v("CC", "Stupid DS: " + mb1240.getVoltage());
         while (((dist > target) || (dist == 0)) && (runTime.seconds() <= time) && opMode.opModeIsActive())
-            dist = (mb1240.getVoltage() / 0.00322);
+            dist = 5*(mb1240.getVoltage()/3.2222) * 25.4;
         return (runTime.seconds() > time) ? target : dist;
         //return mb1240.getVoltage() / 0.00189;
     }
-
+//Vi =
 
 
     // return status

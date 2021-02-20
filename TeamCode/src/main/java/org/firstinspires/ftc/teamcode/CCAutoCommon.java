@@ -93,7 +93,7 @@ public abstract class CCAutoCommon implements CCAuto {
     protected CCAutoOpMode opMode;  // save a copy of the current opMode and robot
     protected CCHardwareBot robot;
     protected Orientation angles;
-    private int YELLOW_PERCENT = 60;
+    private int YELLOW_PERCENT = 45;
     private AppUtil appUtil = AppUtil.getInstance();
     private VuforiaLocalizer vuforiaFTC;
     protected boolean noStone = true;
@@ -427,7 +427,7 @@ public abstract class CCAutoCommon implements CCAuto {
         int numPixels = roi.width * roi.height;
         // Red is 0 (in HSV),
         // but we need to check between 10 and 35
-        for (p = 10; p < 50; p++) {
+        for (p = 5; p < 30; p++) {
             nYellowPixels += (int) resFloat[p];
         }
 
@@ -487,7 +487,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
 
                         Rect TopRoi = new Rect(new Point(346, 235), new Point(376, 145));
-                        Rect BotRoi = new Rect(new Point(400, 230), new Point(376, 145));
+                        Rect BotRoi = new Rect(new Point(400, 230), new Point(430, 145));
                         boolean top = areRingsThere(srcHSV, TopRoi);
                         boolean bot = areRingsThere(srcHSV, BotRoi);
 
@@ -1360,49 +1360,52 @@ public abstract class CCAutoCommon implements CCAuto {
 
         Log.v("BOK", "Color: " + allianceColor + " Inside Route: " +
                 inside + " Stating At Stone: " + startStone);
-      /*  runTime.reset();
-        //move to position
-        if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE){
-
-         //   robot.autoGripRight.setPosition(robot.AUTO_OPEN);
-            arcTurn(-0.5, .14, 12.5, 0, 78, 4);
-            opMode.sleep(250);
-            strafeWithRange(0.7, 29, 50, robot.distanceLeft, 2, 1, false);
-            gyroTurn(0.26, (robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
-                    AxesOrder.XYZ,
-                    AngleUnit.DEGREES).thirdAngle), 90, DT_TURN_THRESHOLD_LOW, false, false, 2);
-            move(0.3, 0.3, 13, false, 2);
-          //  moveWithRangeSensorBack(0.3, 30, 100, 3, robot.distanceBack, false, RS_DIFF_THRESHOLD_CM_LOW);
-       //     robot.autoGripRight.setPosition(robot.AUTO_OPEN);
-         //   robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY);
-           // opMode.sleep(500);
-            //robot.autoGripRight.setPosition(robot.AUTO_GRAB);
-            opMode.sleep(250);
-            //robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN);
-            opMode.sleep(250);
-            strafeWithRange(0.7, 28, 50, robot.distanceLeft, 2, 1, false);
-            followHeadingPID(90, 0.2, 64, false, 4, true);
-
-            gyroTurn(0.25, robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
-                    AxesOrder.XYZ,
-                    AngleUnit.DEGREES).thirdAngle, 90, DT_TURN_THRESHOLD_LOW, false, false, 3);
-
-        //    robot.autoROTRight.setPosition(robot.AUTO_RIGHT_DEPLOY-0.05);
+        gyroTurn(0.3, 0, 30, 1, false, false, 3);
+        followHeadingPID(30,0.3, 50, false, 5, false);
+        opMode.sleep(500);
+        gyroTurn(0.2, 30, 30, 1, false, false, 3);
+        opMode.sleep(500);
+        if(loc == CCAutoRingsLocation.CC_RING_BACK) {
+            gyroTurn(0.3, 30, -30, 1, false, false, 3);
+            followHeadingPID(-35,0.3, 50, false, 5, false);
             opMode.sleep(500);
-          //  robot.autoGripRight.setPosition(robot.AUTO_OPEN);
-            opMode.sleep(250);
-            //robot.autoROTRight.setPosition(robot.AUTO_RIGHTI_IN);
-            //robot.autoGripRight.setPosition(robot.AUTO_GRAB);
+            robot.wobbleGoalArm.setPower(-0.5);
+            robot.wobbleGoalArm.setTargetPosition(-325);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            opMode.sleep(500);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            followHeadingPID(-35,0.3, 20, false, 5, true);
+            gyroTurn(0.3, -35, 0, 1, false, false, 3);
+            followHeadingPID(0,0.3, 3, false, 5, true);
 
 
-            //strafeWithRange(0.7, 20, 100, robot.distanceLeft, 4, 1, false);
         }
-        if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED){
+        if(loc == CCAutoRingsLocation.CC_RING_MID){
+            gyroTurn(0.3, 30, -30, 1, false, false, 3);
+            followHeadingPID(-35,0.3, 30, false, 5, false);
+            opMode.sleep(500);
+            robot.wobbleGoalArm.setPower(-0.5);
+            robot.wobbleGoalArm.setTargetPosition(-325);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            opMode.sleep(500);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            followHeadingPID(-35,0.3, 10, false, 5, true);
+            gyroTurn(0.3, -35, 0, 1, false, false, 3);
+        }
+        if(loc == CCAutoRingsLocation.CC_RING_FRONT){
+            gyroTurn(0.3, 30, -70, 1, false, false, 3);
+            followHeadingPID(-80,0.3, 30, false, 5, false);
+            opMode.sleep(500);
+            robot.wobbleGoalArm.setPower(-0.5);
+            robot.wobbleGoalArm.setTargetPosition(-325);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            opMode.sleep(500);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            followHeadingPID(-70,0.3, 10, false, 5, true);
+            gyroTurn(0.3, -35, 0, 1, false, false, 3);
+            followHeadingPID(0,0.3, 5, false, 5, false);
 
         }
-
-       */
-
 
     }
         public enum CCAutoRingsLocation {

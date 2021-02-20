@@ -60,7 +60,7 @@ public class CCTele {
             }
             if(opMode.gamepad2.a){
                 robot.shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.shooter.setPower(-1);
+                robot.shooter.setPower(-.95);
             }
             if(opMode.gamepad2.b){
                 robot.shooter.setPower(0);
@@ -109,7 +109,7 @@ public class CCTele {
                 Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
             if(opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE){
-                robot.shooterServo.setPosition(0.694);
+                robot.shooterServo.setPosition(0.685);
             }
             if(opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE){
                 robot.boxServo.setPosition(robot.BOX_UP);
