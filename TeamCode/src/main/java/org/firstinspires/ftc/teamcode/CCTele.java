@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class CCTele {
 
@@ -19,6 +18,7 @@ public class CCTele {
     private double speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
     int counter = 0;
     boolean next = false;
+    boolean shooterManualControl = false;
 
 
     public BoKTeleStatus initSoftware(LinearOpMode opMode,
@@ -58,77 +58,112 @@ public class CCTele {
             if (opMode.gamepad1.a) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
             }
-            if(opMode.gamepad2.a){
+            if (opMode.gamepad2.a) {
                 robot.shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.shooter.setPower(-.95);
+                robot.shooter.setPower(.95);
+                robot.verticalIntake.setPower(-1);
+                robot.frontIntake.setPower(-1);
+                robot.gateServo.setPosition(robot.GATE_UP);
+
+
             }
-            if(opMode.gamepad2.b){
+            if (opMode.gamepad2.b) {
                 robot.shooter.setPower(0);
             }
 
-            if(opMode.gamepad2.dpad_up){
-                robot.boxServo.setPosition(robot.BOX_UP);
+            if (opMode.gamepad2.dpad_up) {
+                robot.gateServo.setPosition(robot.GATE_UP);
             }
-            if(opMode.gamepad2.dpad_down){
-                robot.boxServo.setPosition(robot.BOX_DOWN);
+            if (opMode.gamepad2.dpad_down) {
+                robot.gateServo.setPosition(robot.GATE_DOWN);
             }
-            if(opMode.gamepad2.dpad_left){
-                robot.boxFlickerServo.setPosition(robot.FLICKER_OUT);
+            if (opMode.gamepad2.dpad_left ) {
+                //robot.gateServo.setPosition(robot.FLICKER_OUT);
+                robot.verticalIntake.setPower(-1);
             }
-            if(opMode.gamepad2.dpad_right){
-                robot.boxFlickerServo.setPosition(robot.FLICKER_IN);
+            if (opMode.gamepad2.dpad_right) {
+               // robot.gateServo.setPosition(robot.FLICKER_IN);
+                Log.v("BOK", "Angle: " + robot.getShooterAngle(robot.getBatteryVoltage()) + ", Voltage: " + robot.getBatteryVoltage());
+                robot.verticalIntake.setPower(-1);
+
             }
 
 
-            if(opMode.gamepad2.y){
+            if (opMode.gamepad2.y) {
                 robot.wobbleGoalArm.setPower(-0.5);
                 robot.wobbleGoalArm.setTargetPosition(350);
                 robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             }
-            if(opMode.gamepad2.x){
+            if (opMode.gamepad2.x) {
                 robot.wobbleGoalArm.setPower(0.5);
-                robot.wobbleGoalArm.setTargetPosition(150);
+                robot.wobbleGoalArm.setTargetPosition(170);
                 robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             }
-            if(opMode.gamepad2.right_bumper){
+            if (opMode.gamepad2.right_bumper) {
                 robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
             }
-            if(opMode.gamepad2.left_bumper) {
+            if (opMode.gamepad2.left_bumper) {
                 robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
             }
 
 
-            if(opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
+            if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
+                shooterManualControl = true;
                 robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
                 Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
-            if(opMode.gamepad2.left_stick_y < -GAME_TRIGGER_DEAD_ZONE){
+            if(opMode.gamepad2.left_stick_y == 0){
+                shooterManualControl = false;
+            }
+            if (opMode.gamepad2.left_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
                 robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
                 Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
-            if(opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE){
-                robot.shooterServo.setPosition(0.685);
-            }
-            if(opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE){
-                robot.boxServo.setPosition(robot.BOX_UP);
-                robot.boxFlickerServo.setPosition(robot.FLICKER_OUT);
-              //  robot.boxFlickerServo.setPosition(robot.FLICKER_IN);//maybe
-            }
-            if(opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE){
-                robot.frontIntake.setPower(1);
-                robot.verticalIntake.setPower(1);
-                robot.shooter.setPower(0);
-            }
-            if(opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE){
-                robot.frontIntake.setPower(-1);
+            if (opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE) {
+               // robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
+                robot.gateServo.setPosition(robot.GATE_UP);
                 robot.verticalIntake.setPower(-1);
+            }
+            if (opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE) {
+              //  shooterManualControl = true;
+              //  robot.shooterServo.setPosition(robot.SHOOTER_POWER_SHOT_ANGLE);
+                //  robot.boxFlickerServo.setPosition(robot.FLICKER_IN);//maybe
+                robot.shooter.setPower(.95);
+
+            }
+            if(opMode.gamepad2.left_trigger == 0 && !opMode.gamepad2.dpad_right && !opMode.gamepad2.dpad_left ){
+                robot.gateServo.setPosition(robot.GATE_DOWN);
+                robot.verticalIntake.setPower(0);
+            }
+            if(opMode.gamepad2.right_trigger == 0){
                 robot.shooter.setPower(0);
             }
-            robot.frontIntake.setPower(0);
-            robot.verticalIntake.setPower(0);
+            if (opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE) {
+                robot.frontIntake.setPower(1);
+             //   robot.verticalIntake.setPower(1);
+               // robot.gateServo.setPosition(robot.GATE_DOWN);
 
+            //    robot.shooter.setPower(0);
+            }
+            if (opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
+                robot.frontIntake.setPower(-1);
+                //robot.verticalIntake.setPower(-1);
+              //  robot.gateServo.setPosition(robot.GATE_DOWN);
+              //  robot.shooter.setPower(0);
+
+            }
+
+            if(opMode.gamepad2.right_stick_y == 0) {
+
+
+                robot.frontIntake.setPower(0);
+               // robot.verticalIntake.setPower(0);
+            }
+            if (!shooterManualControl){
+                robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
+            }
             /*
             if(opMode.gamepad1.right_bumper){
                 robot.capStoneServo.setPosition(robot.CAP_DROP);

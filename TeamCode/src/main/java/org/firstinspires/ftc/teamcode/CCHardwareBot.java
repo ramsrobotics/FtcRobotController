@@ -6,10 +6,9 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.vuforia.Box3D;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -22,20 +21,28 @@ public abstract class CCHardwareBot {
     protected static final int OPMODE_SLEEP_INTERVAL_MS_SHORT = 10;
 
     protected static final double SPEED_COEFF_SLOW = 0.35;
-    protected static final double SPEED_COEFF_FAST = 0.8;
+    protected static final double SPEED_COEFF_FAST = 0.85;
     protected static final double SPEED_COEFF_TURN = 0.7;
 
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
     protected static final int WAIT_PERIOD = 40; // 40 ms
 
     protected final double BOX_UP = 1.0;
-    protected final double BOX_DOWN = 0.65;
+    protected final double BOX_DOWN = 0.52;
 
-    protected final double FLICKER_OUT = 0.43;
+    protected final double FLICKER_OUT = 0.44;
     protected final double FLICKER_IN = 0.03;
 
+    protected final double GATE_DOWN = 0.4;
+    protected final double GATE_UP = 0;
+
     protected final double WOBBLE_GRIP = 0;
-    protected final double WOBBLE_RELEASE = 0.3;
+    protected final double WOBBLE_RELEASE = 0.7;
+
+    protected final double SHOOTER_OPTIMUM_ANGLE = 0.345;//0.7189
+    protected final double SHOOTER_POWER_SHOT_ANGLE = 0.705;
+    protected final double RING_STOPPER_DOWN = 0.62;
+    protected final double RING_STOPPER_UP = 0.3;
     //Motors
    private static final String WOBBLE_GOAL_ARM = "wbA";
    private static final String FRONT_INTAKE_MOTOR = "fiM";
@@ -43,9 +50,10 @@ public abstract class CCHardwareBot {
    private static final String VERTICAL_INTAKE_MOTOR = "viM";
     //Servos
     private static final String SHOOTER_SERVO = "shS";
-    private static final String BOX_FLICKER_SERVO = "bfS";
-    private static final String BOX_SERVO = "boS";
+    private static final String GATE_SERVO = "gaS";
+  //  private static final String BOX_SERVO = "boS";
     private static final String WOBBLE_CLAW_SERVO = "wbS";
+   // private static final String RING_CATCHER_SERVO = "crS";
     //Sensors
     private static final String IMU_TOP = "imu_top";        // IMU
     private static final String DISTANCE_SENSOR_BACK = "dsB";
@@ -57,9 +65,10 @@ public abstract class CCHardwareBot {
     protected DcMotor verticalIntake;
 
     protected Servo shooterServo;
-    protected Servo boxFlickerServo;
-    protected Servo boxServo;
+    protected Servo gateServo;
+    //protected Servo boxServo;
     protected Servo wobbleClaw;
+  //  protected Servo ringCatcher;
 
     // Sensors
     protected BNO055IMU imu;
@@ -121,18 +130,16 @@ public abstract class CCHardwareBot {
         if(shooterServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        boxFlickerServo = opMode.hardwareMap.servo.get(BOX_FLICKER_SERVO);
-        if(boxFlickerServo == null){
+        gateServo = opMode.hardwareMap.servo.get(GATE_SERVO);
+        if(gateServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        boxServo = opMode.hardwareMap.servo.get(BOX_SERVO);
-        if(boxServo == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
+
         wobbleClaw = opMode.hardwareMap.servo.get(WOBBLE_CLAW_SERVO);
         if(wobbleClaw == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
+
 
         wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -159,22 +166,23 @@ public abstract class CCHardwareBot {
 
 
         // Servos initialization
-        /*
-        if (opMode.getClass().getName().contains("Tele")) {
-         //   intakeServo.setPosition(INTAKE_GRAB_POS);
-           // inRotateServo.setPosition(ROTATE_UP_POS);
-            //foundationGripServo.setPosition(FOUNDATION_GRIP_DOWN);
+
+        if (!opMode.getClass().getName().contains("Tele")) {
+            wobbleClaw.setPosition(WOBBLE_GRIP);
+          //  ringCatcher.setPosition(RING_STOPPER_UP - 0.1);
+           // boxServo.setPosition(BOX_UP);
+            gateServo.setPosition(FLICKER_OUT);
         } else {
             // Do nothing for Teleop so that the robot hardware does not move during
             // initialization
         }
 
-         end comment here*/
+
         imu = opMode.hardwareMap.get(BNO055IMU.class, IMU_TOP);
         if (imu == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        wobbleClaw.setPosition(WOBBLE_GRIP);
+
 
        // wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
        // wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -286,15 +294,40 @@ public abstract class CCHardwareBot {
      */
     protected double getDistanceCM(AnalogInput mb1240, double target, double time, CCAutoOpMode opMode) {
         runTime.reset();
-        double dist = 5*(mb1240.getVoltage()/3.2222) * 25.4;
+        double dist = 2*((mb1240.getVoltage()*1000)/6.4453);
         Log.v("CC", "Stupid DS: " + mb1240.getVoltage());
         while (((dist > target) || (dist == 0)) && (runTime.seconds() <= time) && opMode.opModeIsActive())
-            dist = 5*(mb1240.getVoltage()/3.2222) * 25.4;
+            dist = 2*((mb1240.getVoltage()*1000)/6.4453);
         return (runTime.seconds() > time) ? target : dist;
         //return mb1240.getVoltage() / 0.00189;
     }
 //Vi =
+    protected double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : opMode.hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
+    }
+    protected double getShooterPwr(double batteryVoltage){
+        double shooterPwr = .95 - ((batteryVoltage - 13.4)/10);
+        return shooterPwr;
+    }
+    protected double getShooterAngle(double batteryVoltage){
+        if(batteryVoltage >= 12.3) {
+            return SHOOTER_OPTIMUM_ANGLE -  .5 * (batteryVoltage-12)/100;
+        }
+        if(batteryVoltage < 12.3) {
 
+            return SHOOTER_OPTIMUM_ANGLE;
+        }
+        else{
+            return SHOOTER_OPTIMUM_ANGLE;
+        }
+    }
 
     // return status
     protected enum BoKHardwareStatus {
