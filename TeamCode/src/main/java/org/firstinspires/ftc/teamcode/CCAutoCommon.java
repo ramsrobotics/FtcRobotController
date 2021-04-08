@@ -1042,6 +1042,44 @@ public abstract class CCAutoCommon implements CCAuto {
         //   robot.shooter.setPower(.95);
         }
     }
+    protected void followPath(int numPoints, Point[] points, double lastx, double lasty, double lasttheta, double turnSpeed, double straightsSpeed, int waitForSec){
+        runTime.reset();
+        double currentX = lastx;
+        double currentY = lasty;
+
+        double lastX = lastx;
+        double lastY = lasty;
+
+        double lastTheta = lasttheta;
+        double theta = lastTheta;
+       for(int i = 0; i <= numPoints;i++){
+           if(runTime.seconds() >= waitForSec){
+               break;
+           }
+           if(i != 0){
+               lastX = currentX;
+               lastY = currentY;
+           }
+
+           currentX = currentX + (robot.imu.getLinearAcceleration().xAccel*(runTime.seconds()*runTime.seconds()))/2;
+           currentY = currentY + (robot.imu.getLinearAcceleration().yAccel*(runTime.seconds()*runTime.seconds()))/2;
+           double distance = Math.sqrt(Math.pow(points[i].x - currentX, 2) + Math.pow(points[i].y - currentY, 2));
+           if(i != 0){
+               lastTheta = theta;
+           }
+           theta = Math.asin(currentX/distance);
+
+           if(points[i].x < currentX){
+               theta = -theta;
+           }
+          //might have to replace with new functions to work with this function
+           //remove runtime functionality
+           //remove the stopping of motors, requires debug and test
+           gyroTurn(turnSpeed, lastTheta, theta, 1, false, false, 2);
+           followHeadingPID(theta, straightsSpeed, distance, false, 3, points[i].y < currentY);
+
+       }
+    }
     /**
      * runAuto
      * Helper method called from CCAutoRedStoneInsideOpMode or CCAutoRedStoneOutsideMode
