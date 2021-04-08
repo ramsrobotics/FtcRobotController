@@ -21,7 +21,7 @@ public abstract class CCHardwareBot {
     protected static final int OPMODE_SLEEP_INTERVAL_MS_SHORT = 10;
 
     protected static final double SPEED_COEFF_SLOW = 0.35;
-    protected static final double SPEED_COEFF_FAST = 0.85;
+    protected static final double SPEED_COEFF_FAST = 0.75;
     protected static final double SPEED_COEFF_TURN = 0.7;
 
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
@@ -33,14 +33,14 @@ public abstract class CCHardwareBot {
     protected final double FLICKER_OUT = 0.44;
     protected final double FLICKER_IN = 0.03;
 
-    protected final double GATE_DOWN = 0.4;
+    protected final double GATE_DOWN = 0.45;
     protected final double GATE_UP = 0;
 
-    protected final double WOBBLE_GRIP = 0;
-    protected final double WOBBLE_RELEASE = 0.7;
+    protected final double WOBBLE_GRIP = 0.02;
+    protected final double WOBBLE_RELEASE = 0.4;
 
-    protected final double SHOOTER_OPTIMUM_ANGLE = 0.345;//0.7189
-    protected final double SHOOTER_POWER_SHOT_ANGLE = 0.705;
+    protected final double SHOOTER_OPTIMUM_ANGLE = 0.347;//0.7189
+    protected final double SHOOTER_POWER_SHOT_ANGLE = 0.4;
     protected final double RING_STOPPER_DOWN = 0.62;
     protected final double RING_STOPPER_UP = 0.3;
     //Motors
@@ -318,7 +318,7 @@ public abstract class CCHardwareBot {
     }
     protected double getShooterAngle(double batteryVoltage){
         if(batteryVoltage >= 12.3) {
-            return SHOOTER_OPTIMUM_ANGLE -  .5 * (batteryVoltage-12)/100;
+            return SHOOTER_OPTIMUM_ANGLE +  .9 * (batteryVoltage-12)/100;
         }
         if(batteryVoltage < 12.3) {
 

@@ -72,14 +72,16 @@ public class CCTele {
             }
 
             if (opMode.gamepad2.dpad_up) {
-                robot.gateServo.setPosition(robot.GATE_UP);
+              //  robot.gateServo.setPosition(robot.GATE_UP);
+                robot.shooterServo.setPosition(robot.SHOOTER_POWER_SHOT_ANGLE);
+                shooterManualControl = true;
             }
             if (opMode.gamepad2.dpad_down) {
-                robot.gateServo.setPosition(robot.GATE_DOWN);
+           //     robot.gateServo.setPosition(robot.GATE_DOWN);
             }
             if (opMode.gamepad2.dpad_left ) {
                 //robot.gateServo.setPosition(robot.FLICKER_OUT);
-                robot.verticalIntake.setPower(-1);
+                robot.verticalIntake.setPower(1);
             }
             if (opMode.gamepad2.dpad_right) {
                // robot.gateServo.setPosition(robot.FLICKER_IN);
@@ -90,14 +92,14 @@ public class CCTele {
 
 
             if (opMode.gamepad2.y) {
-                robot.wobbleGoalArm.setPower(-0.5);
-                robot.wobbleGoalArm.setTargetPosition(350);
+                robot.wobbleGoalArm.setPower(-0.2);
+                robot.wobbleGoalArm.setTargetPosition(350);//350
                 robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             }
             if (opMode.gamepad2.x) {
                 robot.wobbleGoalArm.setPower(0.5);
-                robot.wobbleGoalArm.setTargetPosition(170);
+                robot.wobbleGoalArm.setTargetPosition(120);//150
                 robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             }
@@ -114,7 +116,7 @@ public class CCTele {
                 robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
                 Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
-            if(opMode.gamepad2.left_stick_y == 0){
+            if(opMode.gamepad2.dpad_down){
                 shooterManualControl = false;
             }
             if (opMode.gamepad2.left_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
