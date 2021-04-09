@@ -779,7 +779,10 @@ public abstract class CCAutoCommon implements CCAuto {
                     speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
                     speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
                 }
-
+                if(robot.getAvgEncCount()/targetEnc > 0.75){
+                    speedR *= .75;
+                    speedL *= .75;
+                }
 
                 speedL = Range.clip(speedL, -0.9, 0.9);
                 speedR = Range.clip(speedR, -0.9, 0.9);
@@ -847,7 +850,10 @@ public abstract class CCAutoCommon implements CCAuto {
                     speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
                     speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
                 }
-
+                if(robot.getAvgEncCount()/targetEnc > 0.75){
+                    speedR *= .75;
+                    speedL *= .75;
+                }
 
                 speedL = Range.clip(speedL, -0.9, 0.9);
                 speedR = Range.clip(speedR, -0.9, 0.9);
@@ -1123,49 +1129,40 @@ public abstract class CCAutoCommon implements CCAuto {
         //   robot.shooter.setPower(.95);
         }
     }
-    protected Point followPath(int numPoints, Point[] points, double lastx, double lasty, double lasttheta, double turnSpeed, double straightsSpeed, int waitForSec){
+    protected CCPoint goToPoint(Point target, CCPoint init_point, double turnSpeed,
+                                double straightsSpeed, int waitForSec){
+        double distance = Math.sqrt(Math.pow(target.x - init_point.x, 2) +
+                Math.pow(target.y - init_point.y, 2));
+        double theta = -Math.asin(target.y/distance)*57.296;
+        if(target.x < init_point.x){
+            theta = -theta;
+        }
+        gyroTurn(turnSpeed, init_point.theta, theta, 1, false,
+                false, 2);
+        followHeadingPID(theta, straightsSpeed, distance, false,
+                3, target.y < init_point.y);
+        Log.v("BOK", "Current values: current X: " + init_point.x +
+                ", current Y:" + init_point.y + ", currentTheta: " + init_point.theta);
+        Log.v("BOK", "followPath target values: target X: " + target.x +
+                ", target Y:" + target.y + ", target Theta: " + theta +
+                ", target distance: " + distance);
+        return new CCPoint(distance*Math.cos(init_point.theta),
+                distance*Math.sin(init_point.theta), theta);
+
+    }
+    protected CCPoint followPath(int numPoints, Point[] points, double lastx, double lasty,
+                                 double lasttheta, double turnSpeed, double straightsSpeed,
+                                 int waitForSec){
         runTime.reset();
-        double currentX = lastx;
-        double currentY = lasty;
+        CCPoint tempPoint = new CCPoint(lastx, lasty, lasttheta);
+        while(opMode.opModeIsActive() && runTime.seconds() < waitForSec) {
+            for (int i = 0; i <= numPoints; i++) {
+                tempPoint = goToPoint(points[i], tempPoint,
+                        0.2, 0.2, 10);
 
-        double lastX = lastx;
-        double lastY = lasty;
-
-        double lastTheta = lasttheta;
-        double theta = lastTheta;
-       for(int i = 0; i <= numPoints;i++){
-           if(runTime.seconds() >= waitForSec){
-               break;
-           }
-           if(i != 0){
-               lastX = currentX;
-               lastY = currentY;
-           }
-
-           currentX = lastx + ((robot.imu.getLinearAcceleration().xAccel*39.3701)*(runTime.seconds()*runTime.seconds()))/2;
-           currentY = lasty + ((robot.imu.getLinearAcceleration().yAccel*39.3701)*(runTime.seconds()*runTime.seconds()))/2;
-
-           double distance = Math.sqrt(Math.pow(points[i].x - currentX, 2) + Math.pow(points[i].y - currentY, 2));
-           if(i != 0){
-               lastTheta = theta;
-           }
-           theta = -Math.asin(points[i].y/distance)*57.296;
-
-           if(points[i].x < currentX){
-               theta = -theta;
-           }
-           Log.v("BOK", "followPath current values: current X: " + currentX +
-                   ", current Y:" + currentY + ", currentTheta: " + lastTheta);
-           Log.v("BOK", "followPath target values: target X: " + points[i].x +
-                   ", target Y:" + points[i].y + ", target Theta: " + theta + ", target distance: " + distance);
-          //might have to replace with new functions to work with this function
-           //remove runtime functionality
-           //remove the stopping of motors, requires debug and test
-           gyroTurnNoStop(turnSpeed, lastTheta, theta, 1, false, false, 2);
-           followHeadingPIDNoStop(theta, straightsSpeed, distance, 3, points[i].y < currentY);
-
-       }
-       return new Point(currentX, currentY);
+            }
+        }
+       return tempPoint;
     }
     /**
      * runAuto
@@ -1514,6 +1511,16 @@ public abstract class CCAutoCommon implements CCAuto {
             CC_RING_FRONT
         }
 
+}
+class CCPoint{
+    double x;
+    double y;
+    double theta;
+    public CCPoint(double x, double y, double theta){
+        this.x = x;
+        this.y = y;
+        this.theta = theta;
+    }
 }
 
 
