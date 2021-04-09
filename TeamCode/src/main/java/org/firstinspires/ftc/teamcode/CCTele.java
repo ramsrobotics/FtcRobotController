@@ -48,7 +48,7 @@ public class CCTele {
             // Left & Right stick: Drive
             // A:                  Go in fast mode
             // Y:                  Go in slow mode
-
+            Log.v("BOK", "ODS: " + robot.ods.getLightDetected());
             moveRobot();
 
             if (opMode.gamepad1.y) {

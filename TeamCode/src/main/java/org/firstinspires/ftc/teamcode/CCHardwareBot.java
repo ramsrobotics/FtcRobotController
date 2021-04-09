@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -43,6 +44,12 @@ public abstract class CCHardwareBot {
     protected final double SHOOTER_POWER_SHOT_ANGLE = 0.4;
     protected final double RING_STOPPER_DOWN = 0.62;
     protected final double RING_STOPPER_UP = 0.3;
+
+    protected final double PLATE_DOWN = 0.5;
+    protected final double PLATE_UP = 1;
+
+    protected final double INTAKE_GATE_UP = 0;
+    protected final double INTAKE_GATE_DOWN = 0.5;
     //Motors
    private static final String WOBBLE_GOAL_ARM = "wbA";
    private static final String FRONT_INTAKE_MOTOR = "fiM";
@@ -53,11 +60,14 @@ public abstract class CCHardwareBot {
     private static final String GATE_SERVO = "gaS";
   //  private static final String BOX_SERVO = "boS";
     private static final String WOBBLE_CLAW_SERVO = "wbS";
+    private static final String INTAKE_GATE_SERVO = "igS";
+    private static final String INTAKE_PLATE_SERVO = "ipS";
    // private static final String RING_CATCHER_SERVO = "crS";
     //Sensors
     private static final String IMU_TOP = "imu_top";        // IMU
     private static final String DISTANCE_SENSOR_BACK = "dsB";
     private static final String DISTANCE_SENSOR_FRONT = "dsF";
+    private static final String ODS_RING = "odS";
 
     protected DcMotor wobbleGoalArm;
     protected DcMotor frontIntake;
@@ -72,7 +82,7 @@ public abstract class CCHardwareBot {
 
     // Sensors
     protected BNO055IMU imu;
-
+    protected OpticalDistanceSensor ods;
     protected AnalogInput distanceForward;
 
     protected AnalogInput distanceBack;
@@ -156,7 +166,12 @@ public abstract class CCHardwareBot {
         if (distanceForward == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
+      /*  ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
+        if(ods == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
 
+       */
 
 
 

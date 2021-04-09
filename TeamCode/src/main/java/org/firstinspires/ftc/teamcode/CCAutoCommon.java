@@ -595,7 +595,29 @@ public abstract class CCAutoCommon implements CCAuto {
         Log.v("BOK", "turnF: " + angles.thirdAngle);
         return angles.thirdAngle;
     }
+    public double gyroTurnNoStop(double speed,
+                           double init_angle,
+                           double angle,
+                           int threshold,
+                           boolean tank,
+                           boolean leftTank,
+                           double waitForSeconds) {
+        robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //runTime.reset();
 
+        // keep looping while we are still active, and not on heading.
+        while (opMode.opModeIsActive() &&
+                !onHeading(speed, init_angle, angle, threshold, tank, leftTank, P_TURN_COEFF)) {
+
+            // Update telemetry & Allow time for other processes to run.
+            opMode.telemetry.update();
+            //opMode.sleep(CCHardwareBot.OPMODE_SLEEP_INTERVAL_MS_SHORT);
+        }
+
+        robot.setPowerToDTMotors(0.04);
+        Log.v("BOK", "turnF: " + angles.thirdAngle);
+        return angles.thirdAngle;
+    }
     // Code copied from the sample PushbotAutoDriveByGyro_Linear
 
     /**
@@ -779,6 +801,65 @@ public abstract class CCAutoCommon implements CCAuto {
         if (runTime.seconds() >= waitForSec) {
             Log.v("BOK", "followHeadingPID timed out!");
         }
+
+    }
+    protected void followHeadingPIDNoStop(double heading,
+                                          double power,
+                                          double dist,
+                                          double waitForSec, boolean forward) {
+        double angle, error, diffError, turn, speedL, speedR,
+                sumError = 0, lastError = 0, lastTime = 0;
+        double Kp = 0.01, Ki = 0, Kd = 0; // Ki = 0.165; Kd = 0.093;
+        double targetEnc = robot.getTargetEncCount(dist); // convert inches to target enc count
+        //String logString = "dTime,ang,err,sum,last,diff,turn,speedL,speedR\n";
+        Log.v("BOK", "followHeadingPIDNoStop: " + heading + ", dist: " + dist);
+        robot.resetDTEncoders();
+        robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      //  runTime.reset();
+
+        while (opMode.opModeIsActive() &&
+                (robot.getAvgEncCount() < targetEnc)) {
+            double currTime = runTime.seconds();
+            double deltaTime = currTime - lastTime;
+            if (deltaTime >= SAMPLE_RATE_SEC) {
+                angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+                        AxesOrder.XYZ,
+                        AngleUnit.DEGREES);
+                angle = angles.thirdAngle;
+                error = angle - heading;
+                Log.v("BOK", "angle: " + angle + " error: " + error);
+                sumError = sumError * 0.66 + error;
+                diffError = error - lastError;
+                turn = Kp * error + Ki * sumError + Kd * diffError;
+                Log.v("BOK", "angle: " + angle + " error: " + error + " turn: " + turn);
+
+
+                if (forward) {
+                    speedL = (power) + turn;
+                    speedR = (power) - turn;
+                    speedR *= -1;
+                    speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
+                    speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
+                } else {
+                    speedL = (power) - turn;
+                    speedR = (power) + turn;
+                    speedL *= -1;
+                    speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
+                    speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
+                }
+
+
+                speedL = Range.clip(speedL, -0.9, 0.9);
+                speedR = Range.clip(speedR, -0.9, 0.9);
+                robot.setPowerToDTMotors(speedL, speedR);
+                Log.v("BOK", "Follow Heading PID Speed Left: " + speedL + " Speed Right: " + speedR);
+                lastError = error;
+                lastTime = currTime;
+
+            }
+        }
+        robot.setModeForDTMotors(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.setPowerToDTMotors(0);
 
     }
 
@@ -1042,7 +1123,7 @@ public abstract class CCAutoCommon implements CCAuto {
         //   robot.shooter.setPower(.95);
         }
     }
-    protected void followPath(int numPoints, Point[] points, double lastx, double lasty, double lasttheta, double turnSpeed, double straightsSpeed, int waitForSec){
+    protected Point followPath(int numPoints, Point[] points, double lastx, double lasty, double lasttheta, double turnSpeed, double straightsSpeed, int waitForSec){
         runTime.reset();
         double currentX = lastx;
         double currentY = lasty;
@@ -1061,24 +1142,30 @@ public abstract class CCAutoCommon implements CCAuto {
                lastY = currentY;
            }
 
-           currentX = currentX + (robot.imu.getLinearAcceleration().xAccel*(runTime.seconds()*runTime.seconds()))/2;
-           currentY = currentY + (robot.imu.getLinearAcceleration().yAccel*(runTime.seconds()*runTime.seconds()))/2;
+           currentX = lastx + ((robot.imu.getLinearAcceleration().xAccel*39.3701)*(runTime.seconds()*runTime.seconds()))/2;
+           currentY = lasty + ((robot.imu.getLinearAcceleration().yAccel*39.3701)*(runTime.seconds()*runTime.seconds()))/2;
+
            double distance = Math.sqrt(Math.pow(points[i].x - currentX, 2) + Math.pow(points[i].y - currentY, 2));
            if(i != 0){
                lastTheta = theta;
            }
-           theta = Math.asin(currentX/distance);
+           theta = -Math.asin(points[i].y/distance)*57.296;
 
            if(points[i].x < currentX){
                theta = -theta;
            }
+           Log.v("BOK", "followPath current values: current X: " + currentX +
+                   ", current Y:" + currentY + ", currentTheta: " + lastTheta);
+           Log.v("BOK", "followPath target values: target X: " + points[i].x +
+                   ", target Y:" + points[i].y + ", target Theta: " + theta + ", target distance: " + distance);
           //might have to replace with new functions to work with this function
            //remove runtime functionality
            //remove the stopping of motors, requires debug and test
-           gyroTurn(turnSpeed, lastTheta, theta, 1, false, false, 2);
-           followHeadingPID(theta, straightsSpeed, distance, false, 3, points[i].y < currentY);
+           gyroTurnNoStop(turnSpeed, lastTheta, theta, 1, false, false, 2);
+           followHeadingPIDNoStop(theta, straightsSpeed, distance, 3, points[i].y < currentY);
 
        }
+       return new Point(currentX, currentY);
     }
     /**
      * runAuto
@@ -1095,6 +1182,12 @@ public abstract class CCAutoCommon implements CCAuto {
      * Route Away from Mid
      */
     protected void runAuto(boolean inside, boolean startStone, boolean park) {
+        Point[] testPoints = {new Point(25, 3), new Point(26, 4.246),
+                new Point(27, 5.196), new Point(28, 6), new Point(29, 6.708),
+                new Point(30, 7.348), new Point(31, 7.937), new Point(32, 8.485),
+                new Point(33, 9), new Point(34, 9.487), new Point(35, 9.949)};
+        followPath(10, testPoints, 24, 0, 0, 0.2, 0.2, 10);
+        /*
         CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
         Log.v("BOK", "Angle at runAuto start " +
                 robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
