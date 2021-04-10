@@ -1133,21 +1133,22 @@ public abstract class CCAutoCommon implements CCAuto {
                                 double straightsSpeed, int waitForSec){
         double distance = Math.sqrt(Math.pow(target.x - init_point.x, 2) +
                 Math.pow(target.y - init_point.y, 2));
-        double theta = -Math.asin(target.y/distance)*57.296;
+        double theta = (-Math.asin((target.y-init_point.y)/distance)*57.296);
         if(target.x < init_point.x){
             theta = -theta;
         }
-        gyroTurn(turnSpeed, init_point.theta, theta, 1, false,
-                false, 2);
-        followHeadingPID(theta, straightsSpeed, distance, false,
-                3, target.y < init_point.y);
         Log.v("BOK", "Current values: current X: " + init_point.x +
                 ", current Y:" + init_point.y + ", currentTheta: " + init_point.theta);
         Log.v("BOK", "followPath target values: target X: " + target.x +
                 ", target Y:" + target.y + ", target Theta: " + theta +
                 ", target distance: " + distance);
-        return new CCPoint(distance*Math.cos(init_point.theta),
-                distance*Math.sin(init_point.theta), theta);
+        gyroTurn(turnSpeed, init_point.theta, theta, 1, false,
+                false, 5);
+        followHeadingPID(theta, straightsSpeed, distance, false,
+                5, true);
+        Log.v("BOK", "      ");
+        return new CCPoint(Math.abs(distance*Math.cos(theta/57.296)) + init_point.x,
+                Math.abs((distance*Math.sin(theta/57.296))) + init_point.y, theta);
 
     }
     protected CCPoint followPath(int numPoints, Point[] points, double lastx, double lasty,
@@ -1155,13 +1156,13 @@ public abstract class CCAutoCommon implements CCAuto {
                                  int waitForSec){
         runTime.reset();
         CCPoint tempPoint = new CCPoint(lastx, lasty, lasttheta);
-        while(opMode.opModeIsActive() && runTime.seconds() < waitForSec) {
+
             for (int i = 0; i <= numPoints; i++) {
                 tempPoint = goToPoint(points[i], tempPoint,
-                        0.2, 0.2, 10);
+                        0.3, 0.3, 10);
 
             }
-        }
+
        return tempPoint;
     }
     /**
@@ -1183,7 +1184,7 @@ public abstract class CCAutoCommon implements CCAuto {
                 new Point(27, 5.196), new Point(28, 6), new Point(29, 6.708),
                 new Point(30, 7.348), new Point(31, 7.937), new Point(32, 8.485),
                 new Point(33, 9), new Point(34, 9.487), new Point(35, 9.949)};
-        followPath(10, testPoints, 24, 0, 0, 0.2, 0.2, 10);
+        followPath(10, testPoints, 24, 0, 0, 0.35, 0.35, 10);
         /*
         CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
         Log.v("BOK", "Angle at runAuto start " +

@@ -48,9 +48,31 @@ public class CCTele {
             // Left & Right stick: Drive
             // A:                  Go in fast mode
             // Y:                  Go in slow mode
-            Log.v("BOK", "ODS: " + robot.ods.getLightDetected());
+            Log.v("BOK", "ODS: " + robot.ods.getLightDetected() + ", counter: " + counter);
             moveRobot();
+            if(counter == 5){
+                robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
+                counter = 0;
+            }
+          //  if(counter == 0){
+            //    robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
+            //}
+           // if(counter < 10){
+             //   robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
+           // }
 
+            if(robot.ods.getLightDetected() >= 0.6){
+                counter++;
+            }
+            else {
+                counter = 0;
+            }
+            if(opMode.gamepad1.dpad_up){
+                robot.intakePlate.setPosition(robot.PLATE_UP);
+            }
+            if(opMode.gamepad1.dpad_down){
+                robot.intakePlate.setPosition(robot.PLATE_DOWN);
+            }
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
                 counter = 0;
@@ -126,6 +148,7 @@ public class CCTele {
             if (opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE) {
                // robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
                 robot.gateServo.setPosition(robot.GATE_UP);
+                robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
                 robot.verticalIntake.setPower(-1);
             }
             if (opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE) {
@@ -137,6 +160,7 @@ public class CCTele {
             }
             if(opMode.gamepad2.left_trigger == 0 && !opMode.gamepad2.dpad_right && !opMode.gamepad2.dpad_left ){
                 robot.gateServo.setPosition(robot.GATE_DOWN);
+
                 robot.verticalIntake.setPower(0);
             }
             if(opMode.gamepad2.right_trigger == 0){
@@ -151,6 +175,7 @@ public class CCTele {
             }
             if (opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
                 robot.frontIntake.setPower(-1);
+
                 //robot.verticalIntake.setPower(-1);
               //  robot.gateServo.setPosition(robot.GATE_DOWN);
               //  robot.shooter.setPower(0);

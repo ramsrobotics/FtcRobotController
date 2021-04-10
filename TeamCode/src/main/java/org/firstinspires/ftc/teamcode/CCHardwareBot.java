@@ -48,7 +48,7 @@ public abstract class CCHardwareBot {
     protected final double PLATE_DOWN = 0.5;
     protected final double PLATE_UP = 1;
 
-    protected final double INTAKE_GATE_UP = 0;
+    protected final double INTAKE_GATE_UP = 0.35;
     protected final double INTAKE_GATE_DOWN = 0.5;
     //Motors
    private static final String WOBBLE_GOAL_ARM = "wbA";
@@ -78,6 +78,8 @@ public abstract class CCHardwareBot {
     protected Servo gateServo;
     //protected Servo boxServo;
     protected Servo wobbleClaw;
+    protected Servo intakeGate;
+    protected Servo intakePlate;
   //  protected Servo ringCatcher;
 
     // Sensors
@@ -150,6 +152,16 @@ public abstract class CCHardwareBot {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
 
+        intakeGate = opMode.hardwareMap.servo.get(INTAKE_GATE_SERVO);
+        if(intakeGate == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+
+        intakePlate = opMode.hardwareMap.servo.get(INTAKE_PLATE_SERVO);
+        if(intakePlate == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+
 
         wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -166,12 +178,11 @@ public abstract class CCHardwareBot {
         if (distanceForward == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-      /*  ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
+        ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
         if(ods == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
 
-       */
 
 
 
