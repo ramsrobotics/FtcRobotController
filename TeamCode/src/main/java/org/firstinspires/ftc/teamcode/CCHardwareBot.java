@@ -327,6 +327,11 @@ public abstract class CCHardwareBot {
         return (runTime.seconds() > time) ? target : dist;
         //return mb1240.getVoltage() / 0.00189;
     }
+    protected double getDistanceByLinearAcceleration(){
+        return ((imu.getLinearAcceleration().yAccel*39.3701)*(runTime.seconds()*runTime.seconds()))/2;
+    }
+
+
 //Vi =
     protected double getBatteryVoltage() {
         double result = Double.POSITIVE_INFINITY;

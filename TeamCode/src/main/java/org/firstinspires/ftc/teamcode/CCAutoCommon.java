@@ -759,11 +759,11 @@ public abstract class CCAutoCommon implements CCAuto {
                         AngleUnit.DEGREES);
                 angle = angles.thirdAngle;
                 error = angle - heading;
-                Log.v("BOK", "angle: " + angle + " error: " + error);
+              //  Log.v("BOK", "angle: " + angle + " error: " + error);
                 sumError = sumError * 0.66 + error;
                 diffError = error - lastError;
                 turn = Kp * error + Ki * sumError + Kd * diffError;
-                Log.v("BOK", "angle: " + angle + " error: " + error + " turn: " + turn);
+                Log.v("BOK", "angle: " + angle + " error: " + error + " turn: " + turn + " distance: " + (targetEnc - robot.getAvgEncCount()));
 
 
                 if (forward) {
@@ -779,7 +779,7 @@ public abstract class CCAutoCommon implements CCAuto {
                     speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
                     speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
                 }
-                if(robot.getAvgEncCount()/targetEnc > 0.75){
+                if(robot.getAvgEncCount()/targetEnc > 0.75 || robot.getAvgEncCount()/targetEnc < 0.25){
                     speedR *= .75;
                     speedL *= .75;
                 }
@@ -801,6 +801,7 @@ public abstract class CCAutoCommon implements CCAuto {
         }
         robot.setModeForDTMotors(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setPowerToDTMotors(0);
+       // Log.v("BOK", "\n Final Distance: " + robot.g)
         if (runTime.seconds() >= waitForSec) {
             Log.v("BOK", "followHeadingPID timed out!");
         }
@@ -822,6 +823,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
         while (opMode.opModeIsActive() &&
                 (robot.getAvgEncCount() < targetEnc)) {
+
             double currTime = runTime.seconds();
             double deltaTime = currTime - lastTime;
             if (deltaTime >= SAMPLE_RATE_SEC) {
@@ -830,11 +832,11 @@ public abstract class CCAutoCommon implements CCAuto {
                         AngleUnit.DEGREES);
                 angle = angles.thirdAngle;
                 error = angle - heading;
-                Log.v("BOK", "angle: " + angle + " error: " + error);
+               // Log.v("BOK", "angle: " + angle + " error: " + error);
                 sumError = sumError * 0.66 + error;
                 diffError = error - lastError;
                 turn = Kp * error + Ki * sumError + Kd * diffError;
-                Log.v("BOK", "angle: " + angle + " error: " + error + " turn: " + turn);
+                Log.v("BOK", "angle: " + angle + " error: " + error + " turn: " + turn + " distance: " + (targetEnc - robot.getAvgEncCount()));
 
 
                 if (forward) {
@@ -850,7 +852,7 @@ public abstract class CCAutoCommon implements CCAuto {
                     speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
                     speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
                 }
-                if(robot.getAvgEncCount()/targetEnc > 0.75){
+                if(robot.getAvgEncCount()/targetEnc > 0.75 || robot.getAvgEncCount()/targetEnc < 0.25){
                     speedR *= .75;
                     speedL *= .75;
                 }
@@ -1047,67 +1049,7 @@ public abstract class CCAutoCommon implements CCAuto {
         robot.stopMove();
     }
 
-    protected void strafeWithRange(double power, int targetDistance, int capDistance, AnalogInput rangeSensor, int waitForSec, int threshold, boolean right) {
-        double cmCurrent, diffFromTarget = targetDistance, pCoeff, wheelPower;
-        boolean Right = right;
-        robot.setModeForDTMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        runTime.reset();
 
-        //   AnalogInput rangeSensor = robot.distanceBack;
-        opMode.sleep(40);
-        cmCurrent = robot.getDistanceCM(rangeSensor, capDistance, 0.25, opMode);//0.25
-        while (cmCurrent < 20 && opMode.opModeIsActive() && waitForSec < runTime.seconds()) {
-            cmCurrent = robot.getDistanceCM(rangeSensor, capDistance, 2, opMode);//0.25
-
-        }
-        Log.v("BOK", "moveWithRangeSensorBack: " + cmCurrent + ", target: " + targetDistance);
-
-        //if (!Double.isNaN(cmCurrent))
-        if (targetDistance > cmCurrent) {
-            diffFromTarget = targetDistance - cmCurrent;
-            Right = !right;
-        } else {
-            diffFromTarget = cmCurrent - targetDistance;
-
-        }
-
-        while (opMode.opModeIsActive() &&
-                (Math.abs(diffFromTarget) >= threshold)) {
-            Log.v("BOK", "CmCurrent: " + cmCurrent);
-            //Log.v("BOK", "Distance from wall "+cmCurrent);
-            if (runTime.seconds() >= waitForSec) {
-                Log.v("BOK", "moveWithRSBack timed out!" + String.format(" %.1f", waitForSec));
-                break;
-            }
-
-            cmCurrent = robot.getDistanceCM(rangeSensor, capDistance, 0.25, opMode);
-            if (Double.isNaN(cmCurrent) || (cmCurrent >= 255)) // Invalid sensor reading
-                continue;
-
-            diffFromTarget = targetDistance - cmCurrent;
-            pCoeff = diffFromTarget / 15;
-            wheelPower = Range.clip(power * pCoeff, 0, Math.abs(power));
-            if (wheelPower > 0 && wheelPower < 0.7)
-                wheelPower = 0.7; // min power to move
-            if (wheelPower < 0 || wheelPower > -0.7)
-                wheelPower = 0.7;
-
-            //Log.v("BOK", "CM current " + cmCurrent + " diff "+diffFromTarget);
-            // back range sensor
-            robot.setPowerToDTMotorsStrafe(wheelPower, Right);
-            //Log.v("BOK", "Back current RS: " + cmCurrent +
-            //        " Difference: " + diffFromTarget +
-            //        " Power: (move fwd) " + wheelPower);
-        }
-
-        robot.setPowerToDTMotors(0);
-        if (runTime.seconds() >= waitForSec) {
-            Log.v("BOK", "moveWithRangeSensorBack timed out!");
-        }
-        Log.v("BOK", "moveWithRangeSensorBack: " + cmCurrent);
-
-    }
     protected void shootRings(int numRings, int waitForSec){
         int ringCount = 0;
         runTime.reset();
@@ -1513,15 +1455,6 @@ public abstract class CCAutoCommon implements CCAuto {
         }
 
 }
-class CCPoint{
-    double x;
-    double y;
-    double theta;
-    public CCPoint(double x, double y, double theta){
-        this.x = x;
-        this.y = y;
-        this.theta = theta;
-    }
-}
+
 
 
