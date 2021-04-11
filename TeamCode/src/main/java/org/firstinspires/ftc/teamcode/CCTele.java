@@ -34,6 +34,8 @@ public class CCTele {
         this.opMode = opMode;
         this.robot = robot;
         robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.initializeImu();
+
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
 
@@ -45,14 +47,14 @@ public class CCTele {
             // Left & Right stick: Drive
             // A:                  Go in fast mode
             // Y:                  Go in slow mode
-            currentPosition = updatePosition(currentPosition);
-            opMode.telemetry.addData("Position: ", "x: " + currentPosition.x + " y: " + currentPosition.y);
+          //  currentPosition = updatePosition(currentPosition);
+           // opMode.telemetry.addData("Position: ", "x: " + currentPosition.x + " y: " + currentPosition.y);
             moveRobot();
-            if(counter == 5){
+            if(counter == 10){
                 robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
                 counter = 0;
             }
-                    if(robot.ods.getLightDetected() >= 0.6){
+            if(robot.ods.getLightDetected() >= 0.4){
                 counter++;
             }
             else {
@@ -60,9 +62,16 @@ public class CCTele {
             }
             if(opMode.gamepad1.dpad_up){
                 robot.intakePlate.setPosition(robot.PLATE_UP);
+
             }
             if(opMode.gamepad1.dpad_down){
                 robot.intakePlate.setPosition(robot.PLATE_DOWN);
+            }
+            if(opMode.gamepad1.dpad_right){
+                robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
+            }
+            if(opMode.gamepad1.dpad_left){
+                robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
             }
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
@@ -171,7 +180,7 @@ public class CCTele {
                // robot.verticalIntake.setPower(0);
             }
             if (!shooterManualControl){
-                robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
+               robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
             }
             opMode.telemetry.update();
         }
@@ -180,18 +189,36 @@ public class CCTele {
     private CCPoint updatePosition(CCPoint last_point){
         //meter/s^2 to in/s^2
         //radians to degrees
+       // runTime.reset();
         double acceleration = robot.imu.getLinearAcceleration().yAccel*39.3701;
+        if(acceleration< 2 && acceleration > -2){
+            acceleration = 0;
+        }
+        Log.v("BOK", "    ");
+        Log.v("BOK", "accel: " + robot.imu.getLinearAcceleration().yAccel);
         double theta = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
                 AngleUnit.DEGREES).thirdAngle;
-        double accelerationX = acceleration * Math.cos(theta/57.296);
-        double accelerationY = acceleration * Math.sin(theta/57.296);
+        if(theta < 1 && theta > -1){
+            theta = 0;
+        }
+        double accelerationX = acceleration * Math.sin(theta/57.296);
+        double accelerationY = acceleration * Math.cos(theta/57.296);
+
+        if(accelerationX < 2 && accelerationX > -2){
+            accelerationX = 0;
+        }
+        if(accelerationY < 2 && accelerationX > -2){
+            accelerationY = 0;
+        }
+
         double velocityX = accelerationX * runTime.seconds();
         double velocityY = accelerationY * runTime.seconds();
-
+        Log.v("BOK", "accelX: " + accelerationX + " accelY: " + accelerationY + " theta: " + theta);
         double x = last_point.x + last_point.velocityX*runTime.seconds() + (0.5*(accelerationX)*Math.pow(runTime.seconds(), 2));
         double y = last_point.y + last_point.velocityY*runTime.seconds() + (0.5*(accelerationY)*Math.pow(runTime.seconds(), 2));
-
+        Log.v("BOK", "\n X: " + x + " Y: " + y);
+        runTime.reset();
         return new CCPoint(x, y, theta, velocityX, velocityY, accelerationX, accelerationY, acceleration);
     }
     private void moveRobot() {

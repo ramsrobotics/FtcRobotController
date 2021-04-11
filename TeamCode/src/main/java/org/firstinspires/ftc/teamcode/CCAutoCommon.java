@@ -614,7 +614,7 @@ public abstract class CCAutoCommon implements CCAuto {
             //opMode.sleep(CCHardwareBot.OPMODE_SLEEP_INTERVAL_MS_SHORT);
         }
 
-        robot.setPowerToDTMotors(0.04);
+       // robot.setPowerToDTMotors(0.05);
         Log.v("BOK", "turnF: " + angles.thirdAngle);
         return angles.thirdAngle;
     }
@@ -666,7 +666,9 @@ public abstract class CCAutoCommon implements CCAuto {
                 rightSpeed = Range.clip(rightSpeed,
                         DT_TURN_SPEED_LOW,
                         DT_TURN_SPEED_HIGH);
+                Log.v("FollowPath", "here");
             } else {
+                Log.v("FollowPath", "two");
                 rightSpeed = Range.clip(rightSpeed,
                         -DT_TURN_SPEED_HIGH,
                         -DT_TURN_SPEED_LOW);
@@ -674,7 +676,9 @@ public abstract class CCAutoCommon implements CCAuto {
 
             if (!tank) {
                 leftSpeed = rightSpeed;
+                Log.v("FollowPath", "no");
             } else if (leftTank) {
+                Log.v("FollowPath", "yes");
                 leftSpeed = rightSpeed;
                 rightSpeed = 0;
             } else {
@@ -779,7 +783,7 @@ public abstract class CCAutoCommon implements CCAuto {
                     speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
                     speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
                 }
-                if(robot.getAvgEncCount()/targetEnc > 0.75 || robot.getAvgEncCount()/targetEnc < 0.25){
+                if((robot.getAvgEncCount()/targetEnc > 0.75 || robot.getAvgEncCount()/targetEnc < 0.25) && dist > 5){
                     speedR *= .75;
                     speedL *= .75;
                 }
@@ -852,9 +856,14 @@ public abstract class CCAutoCommon implements CCAuto {
                     speedR = Range.clip(speedR, -Math.abs(power), Math.abs(power));
                     speedL = Range.clip(speedL, -Math.abs(power), Math.abs(power));
                 }
-                if(robot.getAvgEncCount()/targetEnc > 0.75 || robot.getAvgEncCount()/targetEnc < 0.25){
-                    speedR *= .75;
-                    speedL *= .75;
+                if(robot.getAvgEncCount()/targetEnc >= 0.75 || robot.getAvgEncCount()/targetEnc <= 0.25){
+                    speedR *= .6;
+                    speedL *= .6;
+                    Log.v("BOK", "Reduced Power! " + speedR);
+                }
+                if(robot.getAvgEncCount()/targetEnc >= 0.9){
+                    speedL *= .4;
+                    speedR *= .4;
                 }
 
                 speedL = Range.clip(speedL, -0.9, 0.9);
@@ -866,8 +875,10 @@ public abstract class CCAutoCommon implements CCAuto {
 
             }
         }
-        robot.setModeForDTMotors(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setPowerToDTMotors(0);
+
+        Log.v("BOK", "EncoderCounts: " + (targetEnc - robot.getAvgEncCount()));
+        robot.setModeForDTMotors(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
@@ -1071,6 +1082,13 @@ public abstract class CCAutoCommon implements CCAuto {
         //   robot.shooter.setPower(.95);
         }
     }
+    protected void SemiCircleMove(double leftPwr, double rightPwr, double leftEnc, double rightEnc){
+        int left = (int)robot.getTargetEncCount(leftEnc);
+        int right = (int)robot.getTargetEncCount(rightEnc);
+
+        robot.setDTMotorEncoderTarget(left, right);
+        robot.setPowerToDTMotors(leftPwr, rightPwr);
+    }
     protected CCPoint goToPoint(Point target, CCPoint init_point, double turnSpeed,
                                 double straightsSpeed, int waitForSec){
         double distance = Math.sqrt(Math.pow(target.x - init_point.x, 2) +
@@ -1079,14 +1097,14 @@ public abstract class CCAutoCommon implements CCAuto {
         if(target.x < init_point.x){
             theta = -theta;
         }
-        Log.v("BOK", "Current values: current X: " + init_point.x +
+        Log.v("FollowPath", "Current values: current X: " + init_point.x +
                 ", current Y:" + init_point.y + ", currentTheta: " + init_point.theta);
-        Log.v("BOK", "followPath target values: target X: " + target.x +
+        Log.v("FollowPath", "followPath target values: target X: " + target.x +
                 ", target Y:" + target.y + ", target Theta: " + theta +
                 ", target distance: " + distance);
-        gyroTurn(turnSpeed, init_point.theta, theta, 1, false,
+        gyroTurnNoStop(turnSpeed, init_point.theta-90,-(90+ theta), 1, false,
                 false, 5);
-        followHeadingPID(theta, straightsSpeed, distance, false,
+        followHeadingPIDNoStop(-(90+ theta), straightsSpeed, distance,
                 5, true);
         Log.v("BOK", "      ");
         return new CCPoint(Math.abs(distance*Math.cos(theta/57.296)) + init_point.x,
@@ -1105,6 +1123,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
             }
 
+            robot.setPowerToDTMotors(0);
        return tempPoint;
     }
     /**
@@ -1122,11 +1141,14 @@ public abstract class CCAutoCommon implements CCAuto {
      * Route Away from Mid
      */
     protected void runAuto(boolean inside, boolean startStone, boolean park) {
-        Point[] testPoints = {new Point(25, 3), new Point(26, 4.246),
-                new Point(27, 5.196), new Point(28, 6), new Point(29, 6.708),
-                new Point(30, 7.348), new Point(31, 7.937), new Point(32, 8.485),
-                new Point(33, 9), new Point(34, 9.487), new Point(35, 9.949)};
-        followPath(10, testPoints, 24, 0, 0, 0.35, 0.35, 10);
+        Point[] testPoints = {new Point(25, 3),
+                new Point(27, 5.196),  new Point(29, 6.708),
+                 new Point(31, 7.937),
+                new Point(33, 9),  new Point(35, 9.949)};
+        followPath(5, testPoints, 24, 0, 90, 0.35, 0.35, 10);
+        /*
+        //SemiCircleMove(-0.5, -0.166, 37.699, 12.566);
+        //followHeadingPID(0, 0.2, 24, false, 3, true);
         /*
         CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
         Log.v("BOK", "Angle at runAuto start " +
