@@ -1090,36 +1090,43 @@ public abstract class CCAutoCommon implements CCAuto {
         robot.setPowerToDTMotors(leftPwr, rightPwr);
     }
     protected CCPoint goToPoint(Point target, CCPoint init_point, double turnSpeed,
-                                double straightsSpeed, int waitForSec){
+                                double straightsSpeed, boolean forward, int waitForSec){
         double distance = Math.sqrt(Math.pow(target.x - init_point.x, 2) +
                 Math.pow(target.y - init_point.y, 2));
         double theta = (-Math.asin((target.y-init_point.y)/distance)*57.296);
-        if(target.x < init_point.x){
-            theta = -theta;
+        if(!forward){
+            if(theta < 0){
+                theta = theta + 180;
+            }
+            else{
+                theta = theta - 180;
+            }
         }
+
         Log.v("FollowPath", "Current values: current X: " + init_point.x +
                 ", current Y:" + init_point.y + ", currentTheta: " + init_point.theta);
         Log.v("FollowPath", "followPath target values: target X: " + target.x +
                 ", target Y:" + target.y + ", target Theta: " + theta +
                 ", target distance: " + distance);
+        //try wo/ gyro turn
         gyroTurnNoStop(turnSpeed, init_point.theta-90,-(90+ theta), 1, false,
                 false, 5);
         followHeadingPIDNoStop(-(90+ theta), straightsSpeed, distance,
-                5, true);
+                5, forward);
         Log.v("BOK", "      ");
         return new CCPoint(Math.abs(distance*Math.cos(theta/57.296)) + init_point.x,
                 Math.abs((distance*Math.sin(theta/57.296))) + init_point.y, theta);
 
     }
     protected CCPoint followPath(int numPoints, Point[] points, double lastx, double lasty,
-                                 double lasttheta, double turnSpeed, double straightsSpeed,
+                                 double lasttheta, double turnSpeed, double straightsSpeed, boolean forward,
                                  int waitForSec){
         runTime.reset();
         CCPoint tempPoint = new CCPoint(lastx, lasty, lasttheta);
 
             for (int i = 0; i <= numPoints; i++) {
                 tempPoint = goToPoint(points[i], tempPoint,
-                        0.3, 0.3, 10);
+                        0.3, 0.3, forward, 10);
 
             }
 
@@ -1140,23 +1147,52 @@ public abstract class CCAutoCommon implements CCAuto {
      *Blue Stone Outside
      * Route Away from Mid
      */
+    //Back(4 stack)
+    Point origin = new Point(69, 7);
+    Point nextPoint = new Point(69, 30);
+    Point[] shootPositionBack = {new Point(67, 54.148), new Point(63, 67.41), new Point(60, 71.299), new Point(58, 72)};
+    Point movePointAfterShootBack = new Point(59, 76.05);//back
+    Point[] wobblePositionBack = {new Point(61, 84.05), new Point(63, 92.45), new Point(65, 101.25), new Point(68.248, 116.394)};//back
+    Point movePointAfterWobbleBack = new Point(47.752, 100);
+    Point[] toRingStackBack = {new Point(45, 85), new Point(43, 72.2), new Point(41, 57.8), new Point(40, 50)};
+    Point moveThroughRingsBackMid = new Point(68, 46);
+    Point[] toSecondWobbleBackMid = {new Point(65, 45.5), new Point(60, 42.685), new Point(55, 37.36), new Point(53, 34.536)};//back
+    Point leaveWobbleBackMid = new Point(65, 62.398);
+    Point[] backToShootBackMid = {new Point(63, 67.41), new Point(60, 71.299), new Point(58, 72)};
+    Point moveAfterSecondWobbleBack = new Point(85, 124);
+    Point parkBack = new Point(80, 80);
+
+    //Mid(1 stack)
+    Point movePointAfterShootMid = new Point(68, 115.2);//back
+    Point movePointAfterWobbleMid = new Point(44.14, 49.694);
+    Point placeSecondWobbleMid = new Point(48, 100);
+    Point parkMid = new Point(48, 80);
+
+    //Front(0 stack)
+    Point pointForWobbleFront = new Point(80, 92);
+    Point pointForSecondWobbleFront = new Point(53, 34);
+    Point placeWobbleFront = new Point(80, 80);
+    Point parkFront = new Point(72, 40);
+
+
+    CCPoint init_point;
     protected void runAuto(boolean inside, boolean startStone, boolean park) {
         Point[] testPoints = {new Point(25, 3),
                 new Point(27, 5.196),  new Point(29, 6.708),
                  new Point(31, 7.937),
                 new Point(33, 9),  new Point(35, 9.949)};
-        followPath(5, testPoints, 24, 0, 90, 0.35, 0.35, 10);
-        /*
+        followPath(5, testPoints, 24, 0, 90, 0.35, 0.35, true,10);
+
         //SemiCircleMove(-0.5, -0.166, 37.699, 12.566);
         //followHeadingPID(0, 0.2, 24, false, 3, true);
-        /*
+
         CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
         Log.v("BOK", "Angle at runAuto start " +
                 robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
                         AngleUnit.DEGREES).thirdAngle);
 
-        // Step 1: find skystone location
+
         try {
             loc = findRings();
         } catch (java.lang.Exception e) {
@@ -1167,6 +1203,15 @@ public abstract class CCAutoCommon implements CCAuto {
 
         Log.v("BOK", "Color: " + allianceColor + " Inside Route: " +
                 inside + " Stating At Stone: " + startStone);
+        if(loc == CCAutoRingsLocation.CC_RING_BACK){
+            init_point = goToPoint(nextPoint, new CCPoint(origin.x, origin.y, 0), 0.3, 0.4, true, 5);
+            init_point = followPath(4, shootPositionBack, init_point.x, init_point.y, init_point.theta, 0.3, 0.4, true, 6);
+            init_point = goToPoint(movePointAfterShootBack, init_point, 0.3, 0.4, false, 6);
+            init_point = followPath(4, wobblePositionBack, init_point.x, init_point.y, init_point.theta, 0.3, 0.4, false, 6);
+            
+
+        }
+        /*
         followHeadingPID(0, 0.2, 2, false, 3, true);
         robot.shooter.setPower(0.95);
         robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
