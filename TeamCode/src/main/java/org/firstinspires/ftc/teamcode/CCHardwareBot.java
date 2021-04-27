@@ -40,16 +40,20 @@ public abstract class CCHardwareBot {
     protected final double WOBBLE_GRIP = 0.02;
     protected final double WOBBLE_RELEASE = 0.4;
 
-    protected final double SHOOTER_OPTIMUM_ANGLE = 0.347;//0.7189
-    protected final double SHOOTER_POWER_SHOT_ANGLE = 0.4;
+    protected final double TRANSFER_ACTIVE = 0;
+    protected final double TRANSFER_PASSIVE = 0.2;
+
+    protected final double SHOOTER_OPTIMUM_ANGLE = 0.395;//0.347
+    protected final double SHOOTER_POWER_SHOT_ANGLE = 0.41;//0.4
+    protected final double SHOOTER_ANGLE_AUTO = 0.397;
     protected final double RING_STOPPER_DOWN = 0.62;
     protected final double RING_STOPPER_UP = 0.3;
 
-    protected final double PLATE_DOWN = 0.5;
+    protected final double PLATE_DOWN = 0.51;
     protected final double PLATE_UP = 1;
 
     protected final double INTAKE_GATE_UP = 0.35;
-    protected final double INTAKE_GATE_DOWN = 0.5;
+    protected final double INTAKE_GATE_DOWN = 0.47;
     //Motors
    private static final String WOBBLE_GOAL_ARM = "wbA";
    private static final String FRONT_INTAKE_MOTOR = "fiM";
@@ -62,6 +66,7 @@ public abstract class CCHardwareBot {
     private static final String WOBBLE_CLAW_SERVO = "wbS";
     private static final String INTAKE_GATE_SERVO = "igS";
     private static final String INTAKE_PLATE_SERVO = "ipS";
+    private static final String TRANSFER_FLICK = "tfS";
    // private static final String RING_CATCHER_SERVO = "crS";
     //Sensors
     private static final String IMU_TOP = "imu_top";        // IMU
@@ -80,6 +85,7 @@ public abstract class CCHardwareBot {
     protected Servo wobbleClaw;
     protected Servo intakeGate;
     protected Servo intakePlate;
+    protected Servo transerFlick;
   //  protected Servo ringCatcher;
 
     // Sensors
@@ -132,13 +138,13 @@ public abstract class CCHardwareBot {
         if(shooter == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        verticalIntake = opMode.hardwareMap.dcMotor.get(VERTICAL_INTAKE_MOTOR);
-        if(verticalIntake == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
+    //    verticalIntake = opMode.hardwareMap.dcMotor.get(VERTICAL_INTAKE_MOTOR);
+      //  if(verticalIntake == null){
+        //    return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        //}
 
         //Servos;
-        shooterServo = opMode.hardwareMap.servo.get(SHOOTER_SERVO);
+       /* shooterServo = opMode.hardwareMap.servo.get(SHOOTER_SERVO);
         if(shooterServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
@@ -146,6 +152,8 @@ public abstract class CCHardwareBot {
         if(gateServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
+
+        */
 
         wobbleClaw = opMode.hardwareMap.servo.get(WOBBLE_CLAW_SERVO);
         if(wobbleClaw == null) {
@@ -161,7 +169,10 @@ public abstract class CCHardwareBot {
         if(intakePlate == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-
+        transerFlick = opMode.hardwareMap.servo.get(TRANSFER_FLICK);
+        if(transerFlick == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
 
         wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -349,7 +360,7 @@ public abstract class CCHardwareBot {
     }
     protected double getShooterAngle(double batteryVoltage){
         if(batteryVoltage >= 12.3) {
-            return SHOOTER_OPTIMUM_ANGLE +  .9 * (batteryVoltage-12)/100;
+            return SHOOTER_OPTIMUM_ANGLE +  .3 * (batteryVoltage-12)/100;
         }
         if(batteryVoltage < 12.3) {
 
@@ -359,7 +370,18 @@ public abstract class CCHardwareBot {
             return SHOOTER_OPTIMUM_ANGLE;
         }
     }
+    protected double getShooterAngleAutonomous(double batteryVoltage, double shooterAngle){
+        if(batteryVoltage >= 12.3) {
+            return shooterAngle +  .4  * (batteryVoltage-12)/100;
+        }
+        if(batteryVoltage < 12.3) {
 
+            return shooterAngle;
+        }
+        else{
+            return shooterAngle;
+        }
+    }
     // return status
     protected enum BoKHardwareStatus {
         BOK_HARDWARE_FAILURE,
