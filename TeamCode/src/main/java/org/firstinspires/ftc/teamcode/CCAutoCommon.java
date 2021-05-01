@@ -1445,31 +1445,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
             robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
             robot.frontIntake.setPower(0);
-          /*  robot.intakePlate.setPosition(robot.PLATE_DOWN);
-            robot.frontIntake.setPower(-1);
-            followHeadingPID(-32, 0.2, 5, false, 3, true, false);
-            opMode.sleep(500);
-           // robot.frontIntake.setPower(0);
-            followHeadingPID(-32, 0.3, 15, false, 3, false, true);
-            //opMode.sleep(500);
-            robot.frontIntake.setPower(0);
-            robot.shooter.setPower(.9);
-            gyroTurn(0.2, -32, -9, 1, false, false, 3);
-            robot.transerFlick.setPosition(robot.TRANSFER_ACTIVE);
-            opMode.sleep(300);
-            robot.transerFlick.setPosition(robot.TRANSFER_PASSIVE);
-            robot.shooter.setPower(.95);
-            opMode.sleep(300);
-            robot.transerFlick.setPosition(robot.TRANSFER_ACTIVE);
-            opMode.sleep(300);
-            robot.transerFlick.setPosition(robot.TRANSFER_PASSIVE);
-            opMode.sleep(300);
-            robot.transerFlick.setPosition(robot.TRANSFER_ACTIVE);
-            opMode.sleep(300);
-            robot.transerFlick.setPosition(robot.TRANSFER_PASSIVE);
-            robot.shooter.setPower(0);
 
-           */
             robot.wobbleGoalArm.setPower(-0.3);
             robot.wobbleGoalArm.setTargetPosition(-315);
             robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -1478,6 +1454,10 @@ public abstract class CCAutoCommon implements CCAuto {
             gyroTurn(0.45, -13, 175, 2, false, false, 4);
             followHeadingPID(175, 0.3, 17, false, 3, false, true);
             robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
+            opMode.sleep(500);
+            robot.wobbleGoalArm.setPower(-0.3);
+            robot.wobbleGoalArm.setTargetPosition(-200);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             opMode.sleep(500);
             followHeadingPID(175, 0.7, 30, false, 4, true, true);
@@ -1489,6 +1469,45 @@ public abstract class CCAutoCommon implements CCAuto {
             robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
             followHeadingPID(0, 0.7, 10, false, 3, true, true);
             robot.setPowerToDTMotors(0);
+        }
+        if(loc == CCAutoRingsLocation.CC_RING_FRONT){
+            followHeadingPID(0, 0.5, 20, false, 4, false, true);
+            robot.wobbleGoalArm.setPower(-0.3);
+            robot.wobbleGoalArm.setTargetPosition(-315);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            opMode.sleep(500);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            opMode.sleep(500);
+            robot.wobbleGoalArm.setPower(0.5);
+            robot.wobbleGoalArm.setTargetPosition(0);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
+            gyroTurn(0.25, 0, -160, 1, false, false, 3);
+            followHeadingPID(-160, 0.5, 40, false, 4, false, true);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            robot.frontIntake.setPower(0);
+
+            robot.wobbleGoalArm.setPower(-0.3);
+            robot.wobbleGoalArm.setTargetPosition(-315);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            followHeadingPID(-160, 0.2, 10, false, 3, false, true);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
+            opMode.sleep(500);
+            robot.wobbleGoalArm.setPower(-0.3);
+            robot.wobbleGoalArm.setTargetPosition(-200);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            followHeadingPID(-160, 0.5, 40, false, 4, true, true);
+            gyroTurn(0.24, -160, 0, 1, false, false, 3);
+            robot.wobbleGoalArm.setPower(-0.3);
+            robot.wobbleGoalArm.setTargetPosition(-200);
+            robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            followHeadingPID(0, 0.2, 10, false, 3, true, true);
+            gyroTurn(0.25, 0, 160, 2, false, false, 3);
+            followHeadingPID(160, 0.3, 10, false, 4, true, true);
+
+
+
         }
        /*
         robot.shooter.setPower(0.95);
