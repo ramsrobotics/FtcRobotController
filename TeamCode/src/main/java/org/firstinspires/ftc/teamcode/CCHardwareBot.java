@@ -41,7 +41,7 @@ public abstract class CCHardwareBot {
     protected final double WOBBLE_RELEASE = 0.4;
 
     protected final double TRANSFER_ACTIVE = 0;
-    protected final double TRANSFER_PASSIVE = 0.2;
+    protected final double TRANSFER_PASSIVE = 0.12;
 
     protected final double SHOOTER_OPTIMUM_ANGLE = 0.395;//0.347
     protected final double SHOOTER_POWER_SHOT_ANGLE = 0.41;//0.4
@@ -49,7 +49,7 @@ public abstract class CCHardwareBot {
     protected final double RING_STOPPER_DOWN = 0.62;
     protected final double RING_STOPPER_UP = 0.3;
 
-    protected final double PLATE_DOWN = 0.51;
+    protected final double PLATE_DOWN = 0.47;
     protected final double PLATE_UP = 1;
 
     protected final double INTAKE_GATE_UP = 0.35;
@@ -208,7 +208,7 @@ public abstract class CCHardwareBot {
             wobbleClaw.setPosition(WOBBLE_GRIP);
           //  ringCatcher.setPosition(RING_STOPPER_UP - 0.1);
            // boxServo.setPosition(BOX_UP);
-            gateServo.setPosition(FLICKER_OUT);
+           // gateServo.setPosition(FLICKER_OUT);
         } else {
             // Do nothing for Teleop so that the robot hardware does not move during
             // initialization
@@ -354,9 +354,17 @@ public abstract class CCHardwareBot {
         }
         return result;
     }
-    protected double getShooterPwr(double batteryVoltage){
-        double shooterPwr = .95 - ((batteryVoltage - 13.4)/10);
-        return shooterPwr;
+    protected double getShooterPwr(double batteryVoltage, double shooterPwr){
+
+        if(batteryVoltage >=13){
+            return shooterPwr - .1*(batteryVoltage-13);
+        }
+        if(batteryVoltage < 12.5){
+            return shooterPwr + .5*(12.5-batteryVoltage);
+        }
+        else {
+            return shooterPwr;
+        }
     }
     protected double getShooterAngle(double batteryVoltage){
         if(batteryVoltage >= 12.3) {

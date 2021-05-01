@@ -26,6 +26,7 @@ public class CCTele {
     boolean next = false;
     boolean shooterManualControl = false;
     boolean transfer = false;
+    double shooterPwr = .95;
 
     protected ElapsedTime runTime = new ElapsedTime();
 
@@ -42,7 +43,7 @@ public class CCTele {
     }
 
     public BoKTeleStatus runSoftware() {
-        CCPoint currentPosition = new CCPoint(0, 0, 0, 0, 0, 0, 0, 0);
+       // CCPoint currentPosition = new CCPoint(0, 0, 0, 0, 0, 0, 0, 0);
         runTime.reset();
         while (opMode.opModeIsActive()) {
             // GAMEPAD 1 CONTROLS:
@@ -73,10 +74,10 @@ public class CCTele {
                 robot.intakePlate.setPosition(robot.PLATE_DOWN);
             }
             if(opMode.gamepad2.b){
-                robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
+               // robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
             }
             if(opMode.gamepad2.a){
-                robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
+               // robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
             }
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
@@ -85,19 +86,14 @@ public class CCTele {
             if (opMode.gamepad1.a) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
             }
-      /*      if (opMode.gamepad2.a) {
-                robot.shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                robot.shooter.setPower(.95);
-                robot.verticalIntake.setPower(-1);
-                robot.frontIntake.setPower(-1);
-                robot.gateServo.setPosition(robot.GATE_UP);
-
+           if (opMode.gamepad2.a) {
+                shooterPwr = .75;
 
             }
             if (opMode.gamepad2.b) {
-                robot.shooter.setPower(0);
+                shooterPwr = .95;
             }
-            */
+
 
 /*
             if (opMode.gamepad2.dpad_up) {
@@ -144,15 +140,15 @@ public class CCTele {
 
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
                 shooterManualControl = true;
-                robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
-                Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
+             //   robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
+              //  Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
             if(opMode.gamepad2.dpad_down){
                 shooterManualControl = false;
             }
             if (opMode.gamepad2.left_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
-                robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
-                Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
+              //  robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
+             //   Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
             }
             if (opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE) {
                // robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
@@ -160,24 +156,36 @@ public class CCTele {
               //  robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
               //  robot.verticalIntake.setPower(-1);
               //  robot.frontIntake.setPower(-1);
-                if(counterTransfer == 10){
+                robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(), shooterPwr));
+
+               if(counterTransfer == 7){
                     robot.transerFlick.setPosition(robot.TRANSFER_PASSIVE);
-                    counterTransfer--;
-                }
-                else if(counterTransfer == 0){
-                    counterTransfer++;
+                    transfer = false;
+                    Log.v("BOK", "lmao");
+               }
+               if(counterTransfer == 0){
                     robot.transerFlick.setPosition(robot.TRANSFER_ACTIVE);
-                }
+                    transfer = true;
+                   Log.v("BOK", "lmao2");
+
+               }
+               if(transfer) {
+                   counterTransfer = counterTransfer + 1;
+               }
+               if(!transfer && counterTransfer != 0){
+                   counterTransfer = counterTransfer - 1;
+               }
+
 
             }
             if (opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE) {
               //  shooterManualControl = true;
               //  robot.shooterServo.setPosition(robot.SHOOTER_POWER_SHOT_ANGLE);
                 //  robot.boxFlickerServo.setPosition(robot.FLICKER_IN);//maybe
-                robot.shooter.setPower(.95);
+                robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(),shooterPwr));
 
             }
-            if(opMode.gamepad2.left_trigger == 0 && !opMode.gamepad2.dpad_right && !opMode.gamepad2.dpad_left ){
+            if(opMode.gamepad2.left_trigger == 0 ){
               //  robot.gateServo.setPosition(robot.GATE_DOWN);
             //    robot.frontIntake.setPower(0);
                 counterTransfer = 0;
@@ -204,6 +212,7 @@ public class CCTele {
          */
             opMode.telemetry.update();
         }
+
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
     private CCPoint updatePosition(CCPoint last_point){
