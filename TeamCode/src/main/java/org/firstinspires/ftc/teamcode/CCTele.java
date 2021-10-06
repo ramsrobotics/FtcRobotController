@@ -117,7 +117,7 @@ public class CCTele {
 
  */
 
-
+            /*
             if (opMode.gamepad2.y) {
                 robot.wobbleGoalArm.setPower(-0.2);
                 robot.wobbleGoalArm.setTargetPosition(350);//350
@@ -137,7 +137,7 @@ public class CCTele {
                 robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
             }
 
-
+            */
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
                 shooterManualControl = true;
              //   robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);

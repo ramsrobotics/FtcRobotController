@@ -1129,13 +1129,13 @@ public abstract class CCAutoCommon implements CCAuto {
                 robot.verticalIntake.setPower(0);
                 //counter = 0;
             }
-            if(robot.ods.getLightDetected() >= 0.4){
+            /* if(robot.ods.getLightDetected() >= 0.4){
                 counter++;
             }
             else {
                 counter = 0;
             }
-
+            */
 
         }
         robot.frontIntake.setPower(0);

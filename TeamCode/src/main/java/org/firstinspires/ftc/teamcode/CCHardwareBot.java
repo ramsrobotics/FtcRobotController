@@ -72,7 +72,7 @@ public abstract class CCHardwareBot {
     private static final String IMU_TOP = "imu_top";        // IMU
     private static final String DISTANCE_SENSOR_BACK = "dsB";
     private static final String DISTANCE_SENSOR_FRONT = "dsF";
-    private static final String ODS_RING = "odS";
+    //private static final String ODS_RING = "odS";
 
     protected DcMotor wobbleGoalArm;
     protected DcMotor frontIntake;
@@ -90,7 +90,7 @@ public abstract class CCHardwareBot {
 
     // Sensors
     protected BNO055IMU imu;
-    protected OpticalDistanceSensor ods;
+    //protected OpticalDistanceSensor ods;
     protected AnalogInput distanceForward;
 
     protected AnalogInput distanceBack;
@@ -189,11 +189,11 @@ public abstract class CCHardwareBot {
         if (distanceForward == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
+        /*ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
         if(ods == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-
+        */
 
 
 
