@@ -83,7 +83,7 @@ public class CCMecanumDT extends CCHardwareBot {
         leftBack.setPower(left);
         rightBack.setPower(right);
         leftFront.setPower(left);
-        rightFront.setPower(right);
+        rightFront.setPower(-right);
         opMode.sleep(OPMODE_SLEEP_INTERVAL_MS_SHORT);
     }
 
@@ -93,7 +93,7 @@ public class CCMecanumDT extends CCHardwareBot {
         leftBack.setPower(leftBackPower);
         rightBack.setPower(rightBackPower);
         leftFront.setPower(leftFrontPower);
-        rightFront.setPower(rightFrontPower);
+        rightFront.setPower(-rightFrontPower);
         if (!noSleep) {
             opMode.sleep(OPMODE_SLEEP_INTERVAL_MS_SHORT);
         }

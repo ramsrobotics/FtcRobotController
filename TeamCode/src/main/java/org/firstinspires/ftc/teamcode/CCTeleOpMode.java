@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Registers the opMode with the driver station.
  * It uses CCMecanumDT and CCTele objects
  */
-@TeleOp(name = "CC TELEOP", group = "CCTele")
+@TeleOp(name = "CC FreightFrenzy", group = "CCTele")
 public class CCTeleOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

@@ -6,7 +6,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -26,7 +25,7 @@ public abstract class CCHardwareBot {
     protected static final double SPEED_COEFF_TURN = 0.7;
 
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
-    protected static final int WAIT_PERIOD = 40; // 40 ms
+    /**protected static final int WAIT_PERIOD = 40; // 40 ms
 
     protected final double BOX_UP = 1.0;
     protected final double BOX_DOWN = 0.52;
@@ -55,9 +54,12 @@ public abstract class CCHardwareBot {
     protected final double INTAKE_GATE_UP = 0.35;
     protected final double INTAKE_GATE_DOWN = 0.47;
     //Motors
-   private static final String WOBBLE_GOAL_ARM = "wbA";
+   private static final String WOBBLE_GOAL_ARM = "wbA";*/
    private static final String FRONT_INTAKE_MOTOR = "fiM";
-   private static final String SHOOTER_MOTOR = "shM";
+   private static final String CAROUSEL_MOTOR = "caM";
+   private static final String LIFT_MOTOR = "liM";
+    private static final String DELIVERY_SERVO = "deS";
+   /**private static final String SHOOTER_MOTOR = "shM";
    private static final String VERTICAL_INTAKE_MOTOR = "viM";
     //Servos
     private static final String SHOOTER_SERVO = "shS";
@@ -67,25 +69,28 @@ public abstract class CCHardwareBot {
     private static final String INTAKE_GATE_SERVO = "igS";
     private static final String INTAKE_PLATE_SERVO = "ipS";
     private static final String TRANSFER_FLICK = "tfS";
-   // private static final String RING_CATCHER_SERVO = "crS";
+   // private static final String RING_CATCHER_SERVO = "crS";*/
     //Sensors
     private static final String IMU_TOP = "imu_top";        // IMU
-    private static final String DISTANCE_SENSOR_BACK = "dsB";
-    private static final String DISTANCE_SENSOR_FRONT = "dsF";
+    /**private static final String DISTANCE_SENSOR_BACK = "dsB";
+    private static final String DISTANCE_SENSOR_FRONT = "dsF";*/
     //private static final String ODS_RING = "odS";
 
-    protected DcMotor wobbleGoalArm;
+    //protected DcMotor wobbleGoalArm;
     protected DcMotor frontIntake;
-    protected DcMotor shooter;
-    protected DcMotor verticalIntake;
-
+    protected DcMotor carouSpinner; //done
+    protected DcMotor linearLift;
+    protected Servo deliverServo; //done
+    //protected DcMotor shooter;
+    //protected DcMotor verticalIntake;
+    /**
     protected Servo shooterServo;
     protected Servo gateServo;
     //protected Servo boxServo;
     protected Servo wobbleClaw;
     protected Servo intakeGate;
     protected Servo intakePlate;
-    protected Servo transerFlick;
+    protected Servo transerFlick;*/
   //  protected Servo ringCatcher;
 
     // Sensors
@@ -126,18 +131,26 @@ public abstract class CCHardwareBot {
      */
     private BoKHardwareStatus initMotorsAndSensors() {
         //Motors
-        wobbleGoalArm = opMode.hardwareMap.dcMotor.get(WOBBLE_GOAL_ARM);
+        /**wobbleGoalArm = opMode.hardwareMap.dcMotor.get(WOBBLE_GOAL_ARM);
         if(wobbleGoalArm == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
+        }*/
         frontIntake = opMode.hardwareMap.dcMotor.get(FRONT_INTAKE_MOTOR);
-        if(frontIntake == null){
+        if(frontIntake == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        shooter = opMode.hardwareMap.dcMotor.get(SHOOTER_MOTOR);
+        carouSpinner = opMode.hardwareMap.dcMotor.get(CAROUSEL_MOTOR);
+        if(carouSpinner == null) {
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        linearLift = opMode.hardwareMap.dcMotor.get(LIFT_MOTOR);
+        if(linearLift == null) {
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        /**shooter = opMode.hardwareMap.dcMotor.get(SHOOTER_MOTOR);
         if(shooter == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
+        }*/
     //    verticalIntake = opMode.hardwareMap.dcMotor.get(VERTICAL_INTAKE_MOTOR);
       //  if(verticalIntake == null){
         //    return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
@@ -154,8 +167,11 @@ public abstract class CCHardwareBot {
         }
 
         */
-
-        wobbleClaw = opMode.hardwareMap.servo.get(WOBBLE_CLAW_SERVO);
+        deliverServo = opMode.hardwareMap.servo.get(DELIVERY_SERVO);
+        if(deliverServo == null){
+            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
+        }
+        /**wobbleClaw = opMode.hardwareMap.servo.get(WOBBLE_CLAW_SERVO);
         if(wobbleClaw == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
@@ -176,19 +192,19 @@ public abstract class CCHardwareBot {
 
         wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        */
         //Sensors
 
 
 
-     distanceBack = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_BACK);
+     /**distanceBack = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_BACK);
         if (distanceBack == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
         distanceForward = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_FRONT);
         if (distanceForward == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
+        }*/
         /*ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
         if(ods == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
@@ -204,7 +220,7 @@ public abstract class CCHardwareBot {
 
         // Servos initialization
 
-        if (!opMode.getClass().getName().contains("Tele")) {
+        /**if (!opMode.getClass().getName().contains("Tele")) {
             wobbleClaw.setPosition(WOBBLE_GRIP);
           //  ringCatcher.setPosition(RING_STOPPER_UP - 0.1);
            // boxServo.setPosition(BOX_UP);
@@ -212,8 +228,7 @@ public abstract class CCHardwareBot {
         } else {
             // Do nothing for Teleop so that the robot hardware does not move during
             // initialization
-        }
-
+        }*/
 
         imu = opMode.hardwareMap.get(BNO055IMU.class, IMU_TOP);
         if (imu == null) {
@@ -230,7 +245,7 @@ public abstract class CCHardwareBot {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        imu.initialize(parameters);
+        //imu.initialize(parameters);
     }
 
     // Initialization of drive train is protected but abstract
@@ -312,13 +327,13 @@ public abstract class CCHardwareBot {
         period.reset();
     }
 
-    protected double getAngle() {
+    /**protected double getAngle() {
 
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
                 AngleUnit.DEGREES);
         return angles.thirdAngle;
-    }
+    }*/
 
     /**
      * getDistanceCM
@@ -338,9 +353,9 @@ public abstract class CCHardwareBot {
         return (runTime.seconds() > time) ? target : dist;
         //return mb1240.getVoltage() / 0.00189;
     }
-    protected double getDistanceByLinearAcceleration(){
+    /*protected double getDistanceByLinearAcceleration(){
         return ((imu.getLinearAcceleration().yAccel*39.3701)*(runTime.seconds()*runTime.seconds()))/2;
-    }
+    }*/
 
 
 //Vi =
@@ -366,7 +381,7 @@ public abstract class CCHardwareBot {
             return shooterPwr;
         }
     }
-    protected double getShooterAngle(double batteryVoltage){
+    /**protected double getShooterAngle(double batteryVoltage){
         if(batteryVoltage >= 12.3) {
             return SHOOTER_OPTIMUM_ANGLE +  .3 * (batteryVoltage-12)/100;
         }
@@ -377,7 +392,7 @@ public abstract class CCHardwareBot {
         else{
             return SHOOTER_OPTIMUM_ANGLE;
         }
-    }
+    }*/
     protected double getShooterAngleAutonomous(double batteryVoltage, double shooterAngle){
         if(batteryVoltage >= 12.3) {
             return shooterAngle +  .4  * (batteryVoltage-12)/100;

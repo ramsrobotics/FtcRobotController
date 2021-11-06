@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -22,6 +23,7 @@ public class CCTele {
     private LinearOpMode opMode;
     private double speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
     int counter = 0;
+    int liftTargetPosition = 0;
     int counterTransfer = 0;
     boolean next = false;
     boolean shooterManualControl = false;
@@ -38,6 +40,7 @@ public class CCTele {
         this.robot = robot;
         robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.initializeImu();
+        robot.linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
@@ -66,19 +69,6 @@ public class CCTele {
             }
 
              */
-            if(opMode.gamepad1.dpad_up){
-                robot.intakePlate.setPosition(robot.PLATE_UP);
-
-            }
-            if(opMode.gamepad1.dpad_down){
-                robot.intakePlate.setPosition(robot.PLATE_DOWN);
-            }
-            if(opMode.gamepad2.b){
-               // robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
-            }
-            if(opMode.gamepad2.a){
-               // robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
-            }
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
                 counter = 0;
@@ -86,122 +76,64 @@ public class CCTele {
             if (opMode.gamepad1.a) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
             }
-           if (opMode.gamepad2.a) {
-                shooterPwr = .75;
 
-            }
-            if (opMode.gamepad2.b) {
-                shooterPwr = .95;
-            }
-
-
-/*
-            if (opMode.gamepad2.dpad_up) {
-              //  robot.gateServo.setPosition(robot.GATE_UP);
-                robot.shooterServo.setPosition(robot.SHOOTER_POWER_SHOT_ANGLE);
-                shooterManualControl = true;
-            }
-            if (opMode.gamepad2.dpad_down) {
-           //     robot.gateServo.setPosition(robot.GATE_DOWN);
-            }
-            if (opMode.gamepad2.dpad_left ) {
-                //robot.gateServo.setPosition(robot.FLICKER_OUT);
-                robot.verticalIntake.setPower(1);
-            }
-            if (opMode.gamepad2.dpad_right) {
-               // robot.gateServo.setPosition(robot.FLICKER_IN);
-                Log.v("BOK", "Angle: " + robot.getShooterAngle(robot.getBatteryVoltage()) + ", Voltage: " + robot.getBatteryVoltage());
-                robot.verticalIntake.setPower(-1);
-
-            }
-
- */
-
-            /*
-            if (opMode.gamepad2.y) {
-                robot.wobbleGoalArm.setPower(-0.2);
-                robot.wobbleGoalArm.setTargetPosition(350);//350
-                robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            if (opMode.gamepad2.a) {
+                //Three inches
             }
             if (opMode.gamepad2.x) {
-                robot.wobbleGoalArm.setPower(0.5);
-                robot.wobbleGoalArm.setTargetPosition(120);//150
-                robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+                //Middle platform
             }
-            if (opMode.gamepad2.right_bumper) {
-                robot.wobbleClaw.setPosition(robot.WOBBLE_GRIP);
+            if (opMode.gamepad2.y) {
+                //Highest possible
             }
-            if (opMode.gamepad2.left_bumper) {
-                robot.wobbleClaw.setPosition(robot.WOBBLE_RELEASE);
+            if (opMode.gamepad2.b) {
+                //Deliver at the press of a button!
             }
 
-            */
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
-                shooterManualControl = true;
-             //   robot.shooterServo.setPosition(robot.shooterServo.getPosition() - 0.001);
-              //  Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
-            }
-            if(opMode.gamepad2.dpad_down){
-                shooterManualControl = false;
+                robot.deliverServo.setPosition(robot.deliverServo.getPosition() - 0.01);
+                opMode.telemetry.addData("CC", "Deliver: " + robot.deliverServo.getPosition());
             }
             if (opMode.gamepad2.left_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
-              //  robot.shooterServo.setPosition(robot.shooterServo.getPosition() + 0.001);
-             //   Log.v("CC", "Shooter: " + robot.shooterServo.getPosition());
+                robot.deliverServo.setPosition(robot.deliverServo.getPosition() + 0.01);
+                opMode.telemetry.addData("CC", "Deliver: " + robot.deliverServo.getPosition());
             }
-            if (opMode.gamepad2.left_trigger > GAME_TRIGGER_DEAD_ZONE) {
-               // robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
-              //  robot.gateServo.setPosition(robot.GATE_UP);
-              //  robot.intakeGate.setPosition(robot.INTAKE_GATE_UP);
-              //  robot.verticalIntake.setPower(-1);
-              //  robot.frontIntake.setPower(-1);
-                robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(), shooterPwr));
 
-               if(counterTransfer == 7){
-                    robot.transerFlick.setPosition(robot.TRANSFER_PASSIVE);
-                    transfer = false;
-                    Log.v("BOK", "lmao");
-               }
-               if(counterTransfer == 0){
-                    robot.transerFlick.setPosition(robot.TRANSFER_ACTIVE);
-                    transfer = true;
-                   Log.v("BOK", "lmao2");
-
-               }
-               if(transfer) {
-                   counterTransfer = counterTransfer + 1;
-               }
-               if(!transfer && counterTransfer != 0){
-                   counterTransfer = counterTransfer - 1;
-               }
-
-
+            if(opMode.gamepad2.right_trigger > 0){
+                robot.carouSpinner.setPower(0.5);
             }
-            if (opMode.gamepad2.right_trigger > GAME_TRIGGER_DEAD_ZONE) {
-              //  shooterManualControl = true;
-              //  robot.shooterServo.setPosition(robot.SHOOTER_POWER_SHOT_ANGLE);
-                //  robot.boxFlickerServo.setPosition(robot.FLICKER_IN);//maybe
-                robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(),shooterPwr));
-
+            if (opMode.gamepad2.right_bumper) {
+                robot.carouSpinner.setPower(-0.5);
             }
-            if(opMode.gamepad2.left_trigger == 0 ){
-              //  robot.gateServo.setPosition(robot.GATE_DOWN);
-            //    robot.frontIntake.setPower(0);
-                counterTransfer = 0;
-                robot.transerFlick.setPosition(robot.TRANSFER_PASSIVE);
-              //  robot.verticalIntake.setPower(0);
-            }
-            if(opMode.gamepad2.right_trigger == 0){
-                robot.shooter.setPower(0);
+            if(opMode.gamepad2.right_trigger == 0 && !opMode.gamepad2.right_bumper){
+                robot.carouSpinner.setPower(0);
             }
             if (opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE) {
-                robot.frontIntake.setPower(1);
+                robot.linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.linearLift.setPower(0.5);
+                liftTargetPosition = robot.linearLift.getCurrentPosition();
             }
             if (opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
-                robot.frontIntake.setPower(-1);
+                robot.linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.linearLift.setPower(-0.2);
+                liftTargetPosition = robot.linearLift.getCurrentPosition();
             }
-            if(opMode.gamepad2.right_stick_y == 0){
+            if(opMode.gamepad2.right_stick_y > -GAME_TRIGGER_DEAD_ZONE && opMode.gamepad2.right_stick_y < GAME_TRIGGER_DEAD_ZONE){
+                robot.linearLift.setTargetPosition(liftTargetPosition);
+                robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.linearLift.setPower(0.08);
+            }
+            if(opMode.gamepad2.right_stick_button){
+                opMode.telemetry.addData("CC", "Lift: " + robot.linearLift.getCurrentPosition());
+            }
+
+            if(opMode.gamepad2.dpad_up || opMode.gamepad2.dpad_down){
+                if (opMode.gamepad2.dpad_up){
+                    robot.frontIntake.setPower(0.5);
+                } else {
+                    robot.frontIntake.setPower(-0.5);
+                }
+            } else {
                 robot.frontIntake.setPower(0);
             }
 
@@ -215,17 +147,17 @@ public class CCTele {
 
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
-    private CCPoint updatePosition(CCPoint last_point){
+    //private CCPoint updatePosition(CCPoint last_point){
         //meter/s^2 to in/s^2
         //radians to degrees
        // runTime.reset();
-        double acceleration = robot.imu.getLinearAcceleration().yAccel*39.3701;
-        if(acceleration< 2 && acceleration > -2){
-            acceleration = 0;
-        }
-        Log.v("BOK", "    ");
-        Log.v("BOK", "accel: " + robot.imu.getLinearAcceleration().yAccel);
-        double theta = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+        //double acceleration = robot.imu.getLinearAcceleration().yAccel*39.3701;
+        //if(acceleration< 2 && acceleration > -2){
+          //  acceleration = 0;
+        //}
+        //Log.v("BOK", "    ");
+        //Log.v("BOK", "accel: " + robot.imu.getLinearAcceleration().yAccel);
+        /**double theta = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
                 AngleUnit.DEGREES).thirdAngle;
         if(theta < 1 && theta > -1){
@@ -248,8 +180,8 @@ public class CCTele {
         double y = last_point.y + last_point.velocityY*runTime.seconds() + (0.5*(accelerationY)*Math.pow(runTime.seconds(), 2));
         Log.v("BOK", "\n X: " + x + " Y: " + y);
         runTime.reset();
-        return new CCPoint(x, y, theta, velocityX, velocityY, accelerationX, accelerationY, acceleration);
-    }
+        return new CCPoint(x, y, theta, velocityX, velocityY, accelerationX, accelerationY, acceleration);*/
+    //}
     private void moveRobot() {
         robot.moveRobotTele(speedCoef);
     }

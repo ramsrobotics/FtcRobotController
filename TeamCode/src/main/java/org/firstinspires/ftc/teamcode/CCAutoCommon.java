@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -36,7 +37,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.Arrays;
-
+@Disabled
 /**
  * Implements the common algorithms used both by BoKAutoBlue* and BoKAutoRed*.
  * Its primary responsibilities include:
@@ -60,6 +61,7 @@ import java.util.Arrays;
  * turn 1 sec
  * park 1 sec
  */
+
 public abstract class CCAutoCommon implements CCAuto {
     protected static final boolean DEBUG_OPEN_CV = false;
     // CONSTANTS
@@ -88,7 +90,7 @@ public abstract class CCAutoCommon implements CCAuto {
     private static final boolean TWO_STONES = false;
     private static final boolean WAIT = false;
     private static final int WAIT_SECONDS = 0;
-    protected CCAuto.BoKAllianceColor allianceColor;
+    protected BoKAllianceColor allianceColor;
     protected ElapsedTime runTime = new ElapsedTime();
     protected CCAutoOpMode opMode;  // save a copy of the current opMode and robot
     protected CCHardwareBot robot;
@@ -143,7 +145,7 @@ public abstract class CCAutoCommon implements CCAuto {
      */
 
     //@Override
-    public CCAuto.BoKAutoStatus initSoftware(CCAutoOpMode opMode,
+    public BoKAutoStatus initSoftware(CCAutoOpMode opMode,
                                              CCHardwareBot robot) {
         loaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         Log.v("BOK", "Initializing OpenCV");
@@ -187,7 +189,7 @@ public abstract class CCAutoCommon implements CCAuto {
         setupRobot();
         opMode.telemetry.addData("Status", "Done initializing gyro!");
         opMode.telemetry.update();
-        return CCAuto.BoKAutoStatus.BOK_AUTO_SUCCESS;
+        return BoKAutoStatus.BOK_AUTO_SUCCESS;
 
 
     }
@@ -703,9 +705,9 @@ public abstract class CCAutoCommon implements CCAuto {
         double robotError;
 
         // calculate error in -179 to +180 range  (
-        angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+        /*angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
-                AngleUnit.DEGREES);
+                AngleUnit.DEGREES);*/
         robotError = targetAngle - angles.thirdAngle;
         while (robotError > 180) robotError -= 360;
         while (robotError <= -180) robotError += 360;
@@ -758,9 +760,9 @@ public abstract class CCAutoCommon implements CCAuto {
             double currTime = runTime.seconds();
             double deltaTime = currTime - lastTime;
             if (deltaTime >= SAMPLE_RATE_SEC) {
-                angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+                /*angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
-                        AngleUnit.DEGREES);
+                        AngleUnit.DEGREES);*/
                 angle = angles.thirdAngle;
                 error = angle - heading;
               //  Log.v("BOK", "angle: " + angle + " error: " + error);
@@ -838,9 +840,9 @@ public abstract class CCAutoCommon implements CCAuto {
             double currTime = runTime.seconds();
             double deltaTime = currTime - lastTime;
             if (deltaTime >= SAMPLE_RATE_SEC) {
-                angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+                /*angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
-                        AngleUnit.DEGREES);
+                        AngleUnit.DEGREES);*/
                 angle = angles.thirdAngle;
                 error = angle - heading;
                // Log.v("BOK", "angle: " + angle + " error: " + error);
@@ -1057,18 +1059,18 @@ public abstract class CCAutoCommon implements CCAuto {
         } else {
             robot.setPowerToDTMotors(laggingPower, leadingPower);
         }
-        while (Math.abs(robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+        /*while (Math.abs(robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
                 AngleUnit.DEGREES).thirdAngle) < Math.abs(targetAngle) && runTime.seconds() < waitForSec && opMode.opModeIsActive()) {
             Log.v("BOK", "IMU: " + robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                     AxesOrder.XYZ,
                     AngleUnit.DEGREES).thirdAngle);
-        }
+        }*/
         robot.stopMove();
     }
 
 
-    protected void shootRings(int numRings, int waitForSec){
+    /**protected void shootRings(int numRings, int waitForSec){
         int ringCount = 0;
         runTime.reset();
         robot.shooterServo.setPosition(robot.getShooterAngleAutonomous(robot.getBatteryVoltage(), robot.SHOOTER_ANGLE_AUTO+.012));
@@ -1090,8 +1092,8 @@ public abstract class CCAutoCommon implements CCAuto {
            ringCount++;
         //   robot.shooter.setPower(.95);
         }
-    }
-    protected void shootRingsTwo(int numRings, int waitForSec){
+    }*/
+    /**protected void shootRingsTwo(int numRings, int waitForSec){
         int ringCount = 0;
         runTime.reset();
         robot.shooterServo.setPosition(robot.getShooterAngleAutonomous(robot.getBatteryVoltage(), robot.SHOOTER_OPTIMUM_ANGLE+0.01));
@@ -1116,14 +1118,15 @@ public abstract class CCAutoCommon implements CCAuto {
             ringCount++;
             //   robot.shooter.setPower(.95);
         }
-    }
+    }*/
+    /**
     protected void intakeRings(int waitForSec){
         robot.verticalIntake.setPower(-1);
         robot.frontIntake.setPower(-1);
         robot.intakePlate.setPosition(robot.PLATE_DOWN);
         runTime.reset();
         int counter = 0;
-        while(opMode.opModeIsActive() && runTime.seconds() < waitForSec){
+        /*while(opMode.opModeIsActive() && runTime.seconds() < waitForSec){
             if(counter == 10){
                 robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
                 robot.verticalIntake.setPower(0);
@@ -1136,10 +1139,10 @@ public abstract class CCAutoCommon implements CCAuto {
                 counter = 0;
             }
             */
-
+/**
         }
         robot.frontIntake.setPower(0);
-    }
+    }*/
     protected void SemiCircleMove(double leftPwr, double rightPwr, double leftEnc, double rightEnc){
         int left = (int)robot.getTargetEncCount(leftEnc);
         int right = (int)robot.getTargetEncCount(rightEnc);
@@ -1247,15 +1250,15 @@ public abstract class CCAutoCommon implements CCAuto {
         //followHeadingPID(0, 0.2, 24, false, 3, true);
 */
         CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
-        Log.v("BOK", "Angle at runAuto start " +
+        /*Log.v("BOK", "Angle at runAuto start " +
                 robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
-                        AngleUnit.DEGREES).thirdAngle);
+                        AngleUnit.DEGREES).thirdAngle);*/
 
 
         try {
             loc = findRings();
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             Log.v("BOK", "Exception at findCube()");
         }
 
@@ -1264,7 +1267,7 @@ public abstract class CCAutoCommon implements CCAuto {
         Log.v("BOK", "Color: " + allianceColor + " Inside Route: " +
                 inside + " Stating At Stone: " + startStone);
 
-        robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(), .9));
+        /**robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(), .9));
         followHeadingPID(0, 0.5, 42, false, 4, false, true);
         gyroTurn(0.2, 0, 3, 1, false, false, 3);
         //opMode.sleep(1000);
@@ -1365,7 +1368,7 @@ public abstract class CCAutoCommon implements CCAuto {
             robot.shooter.setPower(0);
 
            */
-            robot.wobbleGoalArm.setPower(-0.3);
+            /**robot.wobbleGoalArm.setPower(-0.3);
             robot.wobbleGoalArm.setTargetPosition(-315);
             robot.wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //opMode.sleep(500);
