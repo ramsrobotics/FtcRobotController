@@ -19,6 +19,7 @@ public class CCTele {
     private static final double INTAKE_MOTOR_CAP_SPEED = 0.9;
     private static final double Kp = 0.7, Ki = 0.525, Kd = 0.2;
     boolean closeGamepad = false;
+    boolean downFinished = true;
     private CCHardwareBot robot;
     private LinearOpMode opMode;
     private double speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
@@ -98,7 +99,15 @@ public class CCTele {
                 robot.deliverServo.setPosition(robot.deliverServo.getPosition() + 0.01);
                 opMode.telemetry.addData("CC", "Deliver: " + robot.deliverServo.getPosition());
             }
-
+            if (opMode.gamepad2.left_stick_button){
+                robot.deliverServo.setPosition(1);
+            }
+            if (opMode.gamepad2.left_trigger != 0){
+                robot.deliverServo.setPosition(0.6);
+            }
+            if (opMode.gamepad2.left_bumper){
+                robot.deliverServo.setPosition(0.1);
+            }
             if(opMode.gamepad2.right_trigger > 0){
                 robot.carouSpinner.setPower(0.5);
             }
@@ -108,12 +117,18 @@ public class CCTele {
             if(opMode.gamepad2.right_trigger == 0 && !opMode.gamepad2.right_bumper){
                 robot.carouSpinner.setPower(0);
             }
-            if (opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE) {
+            if (opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE) { //down
+                downFinished = false;
+                if(robot.deliverServo.getPosition() >= 0.75){
+                robot.deliverServo.setPosition(0.9); }
                 robot.linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.linearLift.setPower(0.5);
                 liftTargetPosition = robot.linearLift.getCurrentPosition();
             }
-            if (opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE) {
+            if (opMode.gamepad2.right_stick_y < -GAME_TRIGGER_DEAD_ZONE) { //up
+                downFinished = false;
+                if(robot.deliverServo.getPosition() >= 0.75){
+                    robot.deliverServo.setPosition(0.9); }
                 robot.linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.linearLift.setPower(-0.2);
                 liftTargetPosition = robot.linearLift.getCurrentPosition();
@@ -121,7 +136,24 @@ public class CCTele {
             if(opMode.gamepad2.right_stick_y > -GAME_TRIGGER_DEAD_ZONE && opMode.gamepad2.right_stick_y < GAME_TRIGGER_DEAD_ZONE){
                 robot.linearLift.setTargetPosition(liftTargetPosition);
                 robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.linearLift.setPower(0.08);
+                if(liftTargetPosition != 0){
+                   robot.linearLift.setPower(0.1);
+               } else {
+                    robot.linearLift.setPower(1);
+                    //robot.linearLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    //robot.linearLift.setPower(0);
+                    if(robot.linearLift.getCurrentPosition() >= -45) {
+                        downFinished = true;
+                    }
+               }
+            }
+            if(opMode.gamepad2.back){
+                robot.deliverServo.setPosition(0.95);
+                liftTargetPosition = 0;
+                downFinished = false;
+            }
+            if(downFinished) {
+                robot.deliverServo.setPosition(1);
             }
             if(opMode.gamepad2.right_stick_button){
                 opMode.telemetry.addData("CC", "Lift: " + robot.linearLift.getCurrentPosition());
