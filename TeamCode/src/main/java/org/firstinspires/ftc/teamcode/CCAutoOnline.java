@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
+@Disabled
 public class CCAutoOnline extends CCAutoCommon
 {
     public CCAutoOnline() {
@@ -8,6 +11,5 @@ public class CCAutoOnline extends CCAutoCommon
 
     @Override
     public void runSoftware() {
-        runAuto(true, false, false);
     }
 }

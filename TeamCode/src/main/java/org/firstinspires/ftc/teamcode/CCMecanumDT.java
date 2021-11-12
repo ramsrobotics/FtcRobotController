@@ -14,7 +14,7 @@ public class CCMecanumDT extends CCHardwareBot {
     // With 134.4 CPR, it outputs 537.6 PPR. AndyMark Orbital 20 Motor Encoder
     // For 360 degrees wheel turn, motor shaft moves 480 degrees (approx)
     private static final double COUNTS_PER_MOTOR_REV = 384.5; //also could be 383.6
-    private static final double DRIVE_GEAR_REDUCTION = 1;
+    private static final double DRIVE_GEAR_REDUCTION = 3;
     private static final double WHEEL_DIAMETER_INCHES = 3.937;
 
     // CONSTANTS (strings from the robot config)
@@ -69,6 +69,7 @@ public class CCMecanumDT extends CCHardwareBot {
 
         setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE );
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE );
         // Drive train is initialized, initialize sensors
         return BoKHardwareStatus.BOK_HARDWARE_SUCCESS;
     }
@@ -83,7 +84,7 @@ public class CCMecanumDT extends CCHardwareBot {
         leftBack.setPower(left);
         rightBack.setPower(right);
         leftFront.setPower(left);
-        rightFront.setPower(-right);
+        rightFront.setPower(right);
         opMode.sleep(OPMODE_SLEEP_INTERVAL_MS_SHORT);
     }
 
@@ -93,7 +94,7 @@ public class CCMecanumDT extends CCHardwareBot {
         leftBack.setPower(leftBackPower);
         rightBack.setPower(rightBackPower);
         leftFront.setPower(leftFrontPower);
-        rightFront.setPower(-rightFrontPower);
+        rightFront.setPower(rightFrontPower);
         if (!noSleep) {
             opMode.sleep(OPMODE_SLEEP_INTERVAL_MS_SHORT);
         }
@@ -200,11 +201,11 @@ public class CCMecanumDT extends CCHardwareBot {
                             boolean forward) {
         double targetEncCount = getTargetEncCount(inches);
         if (forward) {
-            setDTMotorEncoderTarget((int) targetEncCount, (int) -targetEncCount);
-            setPowerToDTMotors(leftPower, leftPower, -rightPower, -rightPower, false);
+            setDTMotorEncoderTarget((int) targetEncCount, (int) targetEncCount);
+            setPowerToDTMotors(leftPower, leftPower, rightPower, rightPower, false);
         } else {
-            setDTMotorEncoderTarget((int) -targetEncCount, (int) targetEncCount);
-            setPowerToDTMotors(-leftPower, -leftPower, rightPower, rightPower, false);
+            setDTMotorEncoderTarget((int) -targetEncCount, (int) -targetEncCount);
+            setPowerToDTMotors(-leftPower, -leftPower, -rightPower, -rightPower, false);
         }
         return (int) targetEncCount;
     }
@@ -214,11 +215,11 @@ public class CCMecanumDT extends CCHardwareBot {
                                 int encCounts,
                                 boolean forward) {
         if (forward) {
-            setDTMotorEncoderTarget(encCounts, -encCounts);
-            setPowerToDTMotors(leftPower, leftPower, -rightPower, -rightPower, false);
+            setDTMotorEncoderTarget(encCounts, encCounts);
+            setPowerToDTMotors(leftPower, leftPower, rightPower, rightPower, false);
         } else {
-            setDTMotorEncoderTarget(-encCounts, encCounts);
-            setPowerToDTMotors(-leftPower, -leftPower, rightPower, rightPower, false);
+            setDTMotorEncoderTarget(-encCounts, -encCounts);
+            setPowerToDTMotors(-leftPower, -leftPower, -rightPower, -rightPower, false);
         }
     }
 
@@ -228,19 +229,19 @@ public class CCMecanumDT extends CCHardwareBot {
         if (right) {
             leftFrontTarget = (int) targetEncCount;
             leftBackTarget = (int) -targetEncCount;
-            rightFrontTarget = (int) targetEncCount;
-            rightBackTarget = (int) -targetEncCount;
-            setDTMotorEncoderTargetStrafe(leftFrontTarget, leftBackTarget,
-                    rightFrontTarget, rightBackTarget);
-            setPowerToDTMotors(power, -power, power, -power, false);
-        } else {
-            leftFrontTarget = (int) -targetEncCount;
-            leftBackTarget = (int) targetEncCount;
             rightFrontTarget = (int) -targetEncCount;
             rightBackTarget = (int) targetEncCount;
             setDTMotorEncoderTargetStrafe(leftFrontTarget, leftBackTarget,
                     rightFrontTarget, rightBackTarget);
-            setPowerToDTMotors(-power, power, -power, power, false);
+            setPowerToDTMotors(power, -power, -power, power, false);
+        } else {
+            leftFrontTarget = (int) -targetEncCount;
+            leftBackTarget = (int) targetEncCount;
+            rightFrontTarget = (int) targetEncCount;
+            rightBackTarget = (int) -targetEncCount;
+            setDTMotorEncoderTargetStrafe(leftFrontTarget, leftBackTarget,
+                    rightFrontTarget, rightBackTarget);
+            setPowerToDTMotors(-power, power, power, -power, false);
         }
         Log.v("BOK", "Target LF " + leftFrontTarget +
                 ", LB " + leftBackTarget +
@@ -254,13 +255,13 @@ public class CCMecanumDT extends CCHardwareBot {
         double targetEncCount = (rotations * COUNTS_PER_MOTOR_REV) * DRIVE_GEAR_REDUCTION;
         if (right) {
             setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            setPowerToDTMotors(power , -power , power , -power , false);
+            setPowerToDTMotors(power , -power , -power , power , false);
             //setPowerToDTMotors(1, -1, 1, -1, false);
             //setPowerToDTMotors(11.5/13.0, -(12.5/13.0), 1, -(12/13.0), false);
         } else {
             setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             //setPowerToDTMotors(-power*1.1, power*1.25, -power*1.31, power*1.28, false);
-            setPowerToDTMotors(-power , power, -power, power, false);
+            setPowerToDTMotors(-power , power, power, -power, false);
             //setPowerToDTMotors(-power, power*1.25, -power*1.3, power*1.2, false);
         }
         return (int) targetEncCount;
@@ -364,8 +365,8 @@ public class CCMecanumDT extends CCHardwareBot {
 
         setPowerToDTMotors((motorPowerLF * speedCoefLocal),
                 (motorPowerLB * speedCoefLocal),
-                (motorPowerRF * speedCoefLocal),
-                (motorPowerRB * speedCoefLocal), true);
+                (-motorPowerRF * speedCoefLocal),
+                (-motorPowerRB * speedCoefLocal), true);
         //Log.v("BOK", "Moving in MechanumDT");
     }
 

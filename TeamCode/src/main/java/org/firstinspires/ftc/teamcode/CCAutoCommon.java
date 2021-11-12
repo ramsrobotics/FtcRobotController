@@ -37,7 +37,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.Arrays;
-@Disabled
 /**
  * Implements the common algorithms used both by BoKAutoBlue* and BoKAutoRed*.
  * Its primary responsibilities include:
@@ -130,7 +129,7 @@ public abstract class CCAutoCommon implements CCAuto {
 
     @Override
     public void runSoftware() {
-        runAuto(true, true, false);
+        runAuto(false);
     }
 
     /**
@@ -689,7 +688,7 @@ public abstract class CCAutoCommon implements CCAuto {
         }
 
         // Send desired speeds to motors.
-        robot.setOnHeading(leftSpeed, rightSpeed);
+        robot.setOnHeading(leftSpeed, -rightSpeed);
 
         return onTarget;
     }
@@ -705,9 +704,9 @@ public abstract class CCAutoCommon implements CCAuto {
         double robotError;
 
         // calculate error in -179 to +180 range  (
-        /*angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+        angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
-                AngleUnit.DEGREES);*/
+                AngleUnit.DEGREES);
         robotError = targetAngle - angles.thirdAngle;
         while (robotError > 180) robotError -= 360;
         while (robotError <= -180) robotError += 360;
@@ -760,9 +759,9 @@ public abstract class CCAutoCommon implements CCAuto {
             double currTime = runTime.seconds();
             double deltaTime = currTime - lastTime;
             if (deltaTime >= SAMPLE_RATE_SEC) {
-                /*angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+                angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
-                        AngleUnit.DEGREES);*/
+                        AngleUnit.DEGREES);
                 angle = angles.thirdAngle;
                 error = angle - heading;
               //  Log.v("BOK", "angle: " + angle + " error: " + error);
@@ -840,9 +839,9 @@ public abstract class CCAutoCommon implements CCAuto {
             double currTime = runTime.seconds();
             double deltaTime = currTime - lastTime;
             if (deltaTime >= SAMPLE_RATE_SEC) {
-                /*angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+                angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                         AxesOrder.XYZ,
-                        AngleUnit.DEGREES);*/
+                        AngleUnit.DEGREES);
                 angle = angles.thirdAngle;
                 error = angle - heading;
                // Log.v("BOK", "angle: " + angle + " error: " + error);
@@ -1059,13 +1058,13 @@ public abstract class CCAutoCommon implements CCAuto {
         } else {
             robot.setPowerToDTMotors(laggingPower, leadingPower);
         }
-        /*while (Math.abs(robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
+        while (Math.abs(robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
                 AngleUnit.DEGREES).thirdAngle) < Math.abs(targetAngle) && runTime.seconds() < waitForSec && opMode.opModeIsActive()) {
             Log.v("BOK", "IMU: " + robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                     AxesOrder.XYZ,
                     AngleUnit.DEGREES).thirdAngle);
-        }*/
+        }
         robot.stopMove();
     }
 
@@ -1239,33 +1238,73 @@ public abstract class CCAutoCommon implements CCAuto {
 
 
     CCPoint init_point;
-    protected void runAuto(boolean inside, boolean startStone, boolean park) {
-       /* Point[] testPoints = {new Point(25, 3),
-                new Point(27, 5.196),  new Point(29, 6.708),
-                 new Point(31, 7.937),
-                new Point(33, 9),  new Point(35, 9.949)};
-        followPath(5, testPoints, 24, 0, 90, 0.35, 0.35, true,10);
-
-        //SemiCircleMove(-0.5, -0.166, 37.699, 12.566);
-        //followHeadingPID(0, 0.2, 24, false, 3, true);
-*/
-        CCAutoRingsLocation loc = CCAutoRingsLocation.CC_RING_UNKNOWN;
-        /*Log.v("BOK", "Angle at runAuto start " +
-                robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
-                        AxesOrder.XYZ,
-                        AngleUnit.DEGREES).thirdAngle);*/
-
-
-        try {
-            loc = findRings();
-        } catch (Exception e) {
-            Log.v("BOK", "Exception at findCube()");
-        }
-
-        Log.v("BOK", "StoneLoc: " + loc);
-
-        Log.v("BOK", "Color: " + allianceColor + " Inside Route: " +
-                inside + " Stating At Stone: " + startStone);
+    protected void runAuto(boolean inside) {
+       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED && inside){
+            strafe(0.6, 3.5, true, 5);
+       }
+       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE && inside){
+           strafe(0.3, 3.5, false, 5);
+       }
+       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED && !inside){
+           robot.deliverServo.setPosition(0.95);
+           robot.linearLift.setTargetPosition(-850);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(0.6);
+           opMode.sleep(200);
+           robot.deliverServo.setPosition(0.65);
+           opMode.sleep(300);
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,145,2, false, false, 5);
+           opMode.sleep(500);
+           move(0.3,0.3,7.0,false,5);
+           robot.deliverServo.setPosition(0);
+           opMode.sleep(1500);
+           robot.deliverServo.setPosition(0.95);
+           opMode.sleep(500);
+           robot.linearLift.setTargetPosition(0);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(1);
+           move(0.3,0.3,8,true,5);
+           gyroTurn(0.2,145,180,1, false, false, 5);
+           strafe(0.6,2.5,true, 5);
+           move(0.3,0.3,2,true,5);
+           opMode.sleep(1000);
+           robot.carouSpinner.setPower(0.75);
+           opMode.sleep(3500);
+           robot.carouSpinner.setPower(0);
+           move(0.3,0.3,13.0,false,5);
+           robot.deliverServo.setPosition(1);
+       }
+       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE && !inside){
+           robot.deliverServo.setPosition(0.95);
+           robot.linearLift.setTargetPosition(-850);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(0.6);
+           opMode.sleep(200);
+           robot.deliverServo.setPosition(0.65);
+           opMode.sleep(300);
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,145,2, false, false, 5);
+           opMode.sleep(500);
+           move(0.3,0.3,7.0,false,5);
+           robot.deliverServo.setPosition(0);
+           opMode.sleep(1500);
+           robot.deliverServo.setPosition(0.95);
+           opMode.sleep(500);
+           robot.linearLift.setTargetPosition(0);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(1);
+           move(0.3,0.3,8,true,5);
+           gyroTurn(0.2,-145,-270,1, false, false, 5);
+           move(0.3,0.3,8,true,5);
+           strafe(0.6,0.5,true, 5);
+           opMode.sleep(1000);
+           robot.carouSpinner.setPower(-0.75);
+           opMode.sleep(3500);
+           robot.carouSpinner.setPower(0);
+           strafe(0.6,1.0,false, 5);
+           robot.deliverServo.setPosition(1);
+       }
 
         /**robot.shooter.setPower(robot.getShooterPwr(robot.getBatteryVoltage(), .9));
         followHeadingPID(0, 0.5, 42, false, 4, false, true);

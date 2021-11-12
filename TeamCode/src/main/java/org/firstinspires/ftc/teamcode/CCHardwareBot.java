@@ -21,7 +21,7 @@ public abstract class CCHardwareBot {
     protected static final int OPMODE_SLEEP_INTERVAL_MS_SHORT = 10;
 
     protected static final double SPEED_COEFF_SLOW = 0.35;
-    protected static final double SPEED_COEFF_FAST = 0.75;
+    protected static final double SPEED_COEFF_FAST = 0.9;
     protected static final double SPEED_COEFF_TURN = 0.7;
 
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
@@ -245,7 +245,7 @@ public abstract class CCHardwareBot {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        //imu.initialize(parameters);
+        imu.initialize(parameters);
     }
 
     // Initialization of drive train is protected but abstract
@@ -327,13 +327,13 @@ public abstract class CCHardwareBot {
         period.reset();
     }
 
-    /**protected double getAngle() {
+    protected double getAngle() {
 
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.XYZ,
                 AngleUnit.DEGREES);
         return angles.thirdAngle;
-    }*/
+    }
 
     /**
      * getDistanceCM
