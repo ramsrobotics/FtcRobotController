@@ -1240,12 +1240,8 @@ public abstract class CCAutoCommon implements CCAuto {
     CCPoint init_point;
     protected void runAuto(boolean inside) {
        if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED && inside){
-            strafe(0.6, 3.5, true, 5);
-       }
-       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE && inside){
-           strafe(0.3, 3.5, false, 5);
-       }
-       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED && !inside){
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,-145,2, false, false, 5);
            robot.deliverServo.setPosition(0.95);
            robot.linearLift.setTargetPosition(-850);
            robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -1253,9 +1249,59 @@ public abstract class CCAutoCommon implements CCAuto {
            opMode.sleep(200);
            robot.deliverServo.setPosition(0.65);
            opMode.sleep(300);
+           move(0.3,0.3,7.0,false,5);
+           robot.deliverServo.setPosition(0);
+           opMode.sleep(1500);
+           robot.deliverServo.setPosition(0.95);
+           opMode.sleep(500);
+           robot.linearLift.setTargetPosition(0);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(1);
+           move(0.3,0.3,7.0,true,5);
+           gyroTurn(0.4,-145,0,2, false, false, 5);
+           move(0.3,0.3,12.0,false,5);
+           strafe(0.3, 3.5, true, 5);
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,-145,2, false, false, 5);
+           robot.deliverServo.setPosition(1);
+       }
+       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE && inside){
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,145,2, false, false, 5);
+           robot.deliverServo.setPosition(0.95);
+           robot.linearLift.setTargetPosition(-850);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(0.6);
+           opMode.sleep(200);
+           robot.deliverServo.setPosition(0.65);
+           opMode.sleep(300);
+           move(0.3,0.3,7.0,false,5);
+           robot.deliverServo.setPosition(0);
+           opMode.sleep(1500);
+           robot.deliverServo.setPosition(0.95);
+           opMode.sleep(500);
+           robot.linearLift.setTargetPosition(0);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(1);
+           move(0.3,0.3,7.0,true,5);
+           gyroTurn(0.4,145,0,2, false, false, 5);
+           move(0.3,0.3,12.0,false,5);
+           strafe(0.3, 3.5, false, 5);
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,-145,2, false, false, 5);
+           robot.deliverServo.setPosition(1);
+       }
+       if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_RED && !inside){
            move(0.3,0.3,10.0,true,5);
            gyroTurn(0.4,0,145,2, false, false, 5);
            opMode.sleep(500);
+           robot.deliverServo.setPosition(0.95);
+           robot.linearLift.setTargetPosition(-850);
+           robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+           robot.linearLift.setPower(0.6);
+           opMode.sleep(200);
+           robot.deliverServo.setPosition(0.65);
+           opMode.sleep(300);
            move(0.3,0.3,7.0,false,5);
            robot.deliverServo.setPosition(0);
            opMode.sleep(1500);
@@ -1276,6 +1322,9 @@ public abstract class CCAutoCommon implements CCAuto {
            robot.deliverServo.setPosition(1);
        }
        if(allianceColor == BoKAllianceColor.BOK_ALLIANCE_BLUE && !inside){
+           move(0.3,0.3,10.0,true,5);
+           gyroTurn(0.4,0,-145,2, false, false, 5);
+           opMode.sleep(500);
            robot.deliverServo.setPosition(0.95);
            robot.linearLift.setTargetPosition(-850);
            robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -1283,9 +1332,6 @@ public abstract class CCAutoCommon implements CCAuto {
            opMode.sleep(200);
            robot.deliverServo.setPosition(0.65);
            opMode.sleep(300);
-           move(0.3,0.3,10.0,true,5);
-           gyroTurn(0.4,0,145,2, false, false, 5);
-           opMode.sleep(500);
            move(0.3,0.3,7.0,false,5);
            robot.deliverServo.setPosition(0);
            opMode.sleep(1500);
@@ -1295,14 +1341,14 @@ public abstract class CCAutoCommon implements CCAuto {
            robot.linearLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
            robot.linearLift.setPower(1);
            move(0.3,0.3,8,true,5);
-           gyroTurn(0.2,-145,-270,1, false, false, 5);
-           move(0.3,0.3,8,true,5);
+           gyroTurn(0.2,-145,270,1, false, false, 5);
+           move(0.3,0.3,32,true,5);
            strafe(0.6,0.5,true, 5);
            opMode.sleep(1000);
            robot.carouSpinner.setPower(-0.75);
            opMode.sleep(3500);
            robot.carouSpinner.setPower(0);
-           strafe(0.6,1.0,false, 5);
+           strafe(0.6,1.5,false, 5);
            robot.deliverServo.setPosition(1);
        }
 
