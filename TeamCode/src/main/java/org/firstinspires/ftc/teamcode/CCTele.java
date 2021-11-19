@@ -80,15 +80,18 @@ public class CCTele {
 
             if (opMode.gamepad2.a) {
                 //Three inches
+                robot.deliverServo.setPosition(-180);
             }
             if (opMode.gamepad2.x) {
                 //Middle platform
+                robot.deliverServo.setPosition(-280);
             }
             if (opMode.gamepad2.y) {
-                //Highest possible
+                //top platform
+                robot.deliverServo.setPosition(-380);
             }
             if (opMode.gamepad2.b) {
-                //Deliver at the press of a button!
+                robot.deliverServo.setPosition(1);
             }
 
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
