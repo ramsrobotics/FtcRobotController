@@ -80,18 +80,18 @@ public class CCTele {
 
             if (opMode.gamepad2.a) {
                 //Three inches
-                robot.deliverServo.setPosition(-180);
+                liftTargetPosition = -280;
             }
             if (opMode.gamepad2.x) {
                 //Middle platform
-                robot.deliverServo.setPosition(-280);
+                liftTargetPosition = -380;
             }
             if (opMode.gamepad2.y) {
                 //top platform
-                robot.deliverServo.setPosition(-380);
+                liftTargetPosition = -480;
             }
             if (opMode.gamepad2.b) {
-                robot.deliverServo.setPosition(1);
+                robot.deliverServo.setPosition(0);
             }
 
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
@@ -107,9 +107,6 @@ public class CCTele {
             }
             if (opMode.gamepad2.left_trigger != 0){
                 robot.deliverServo.setPosition(0.6);
-            }
-            if (opMode.gamepad2.left_bumper){
-                robot.deliverServo.setPosition(0.1);
             }
             if(opMode.gamepad2.right_trigger > 0){
                 robot.carouSpinner.setPower(0.5);
@@ -172,11 +169,18 @@ public class CCTele {
                 robot.frontIntake.setPower(0);
             }
 
-        /*    if (!shooterManualControl){
-               robot.shooterServo.setPosition(robot.getShooterAngle(robot.getBatteryVoltage()));
+            if(opMode.gamepad2.dpad_left){
+                //TSE Up
+                //robot.deliverServo.setPosition(robot.deliverServo.getPosition() + 0.01);
             }
-
-         */
+            if(opMode.gamepad2.dpad_right){
+                //TSE Down
+                //robot.deliverServo.setPosition(robot.deliverServo.getPosition() - 0.01);
+            }
+            if(opMode.gamepad2.left_bumper){
+                //The big extension
+                //robot.deliverServo.setPosition();
+            }
             opMode.telemetry.update();
         }
 
