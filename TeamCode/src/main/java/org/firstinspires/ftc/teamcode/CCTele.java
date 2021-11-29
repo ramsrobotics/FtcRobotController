@@ -80,15 +80,15 @@ public class CCTele {
 
             if (opMode.gamepad2.a) {
                 //Three inches
-                liftTargetPosition = -280;
+                liftTargetPosition = -180;
             }
             if (opMode.gamepad2.x) {
                 //Middle platform
-                liftTargetPosition = -380;
+                liftTargetPosition = -280;
             }
             if (opMode.gamepad2.y) {
                 //top platform
-                liftTargetPosition = -480;
+                liftTargetPosition = -380;
             }
             if (opMode.gamepad2.b) {
                 robot.deliverServo.setPosition(0);
@@ -148,7 +148,7 @@ public class CCTele {
                }
             }
             if(opMode.gamepad2.back){
-                robot.deliverServo.setPosition(0.95);
+                robot.deliverServo.setPosition(0.925);
                 liftTargetPosition = 0;
                 downFinished = false;
             }
@@ -157,6 +157,7 @@ public class CCTele {
             }
             if(opMode.gamepad2.right_stick_button){
                 opMode.telemetry.addData("CC", "Lift: " + robot.linearLift.getCurrentPosition());
+                liftTargetPosition = -50;
             }
 
             if(opMode.gamepad2.dpad_up || opMode.gamepad2.dpad_down){
