@@ -5,6 +5,7 @@ import android.util.Log;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -25,73 +26,22 @@ public abstract class CCHardwareBot {
     protected static final double SPEED_COEFF_TURN = 0.7;
 
     protected static final double GAME_STICK_DEAD_ZONE = 0.1;
-    /**protected static final int WAIT_PERIOD = 40; // 40 ms
-
-    protected final double BOX_UP = 1.0;
-    protected final double BOX_DOWN = 0.52;
-
-    protected final double FLICKER_OUT = 0.44;
-    protected final double FLICKER_IN = 0.03;
-
-    protected final double GATE_DOWN = 0.45;
-    protected final double GATE_UP = 0;
-
-    protected final double WOBBLE_GRIP = 0.02;
-    protected final double WOBBLE_RELEASE = 0.4;
-
-    protected final double TRANSFER_ACTIVE = 0;
-    protected final double TRANSFER_PASSIVE = 0.12;
-
-    protected final double SHOOTER_OPTIMUM_ANGLE = 0.395;//0.347
-    protected final double SHOOTER_POWER_SHOT_ANGLE = 0.41;//0.4
-    protected final double SHOOTER_ANGLE_AUTO = 0.397;
-    protected final double RING_STOPPER_DOWN = 0.62;
-    protected final double RING_STOPPER_UP = 0.3;
-
-    protected final double PLATE_DOWN = 0.47;
-    protected final double PLATE_UP = 1;
-
-    protected final double INTAKE_GATE_UP = 0.35;
-    protected final double INTAKE_GATE_DOWN = 0.47;
-    //Motors
-   private static final String WOBBLE_GOAL_ARM = "wbA";*/
    private static final String FRONT_INTAKE_MOTOR = "fiM";
    private static final String CAROUSEL_MOTOR = "caM";
    private static final String LIFT_MOTOR = "liM";
     private static final String DELIVERY_SERVO = "deS";
-   /**private static final String SHOOTER_MOTOR = "shM";
-   private static final String VERTICAL_INTAKE_MOTOR = "viM";
-    //Servos
-    private static final String SHOOTER_SERVO = "shS";
-    private static final String GATE_SERVO = "gaS";
-  //  private static final String BOX_SERVO = "boS";
-    private static final String WOBBLE_CLAW_SERVO = "wbS";
-    private static final String INTAKE_GATE_SERVO = "igS";
-    private static final String INTAKE_PLATE_SERVO = "ipS";
-    private static final String TRANSFER_FLICK = "tfS";
-   // private static final String RING_CATCHER_SERVO = "crS";*/
+    private static final String TSE_SERVO_EXTEND = "teS";
+    private static final String TSE_SERVO_ROTATE = "trS";
     //Sensors
     private static final String IMU_TOP = "imu_top";        // IMU
-    /**private static final String DISTANCE_SENSOR_BACK = "dsB";
-    private static final String DISTANCE_SENSOR_FRONT = "dsF";*/
-    //private static final String ODS_RING = "odS";
 
     //protected DcMotor wobbleGoalArm;
     protected DcMotor frontIntake;
     protected DcMotor carouSpinner; //done
     protected DcMotor linearLift;
     protected Servo deliverServo; //done
-    //protected DcMotor shooter;
-    //protected DcMotor verticalIntake;
-    /**
-    protected Servo shooterServo;
-    protected Servo gateServo;
-    //protected Servo boxServo;
-    protected Servo wobbleClaw;
-    protected Servo intakeGate;
-    protected Servo intakePlate;
-    protected Servo transerFlick;*/
-  //  protected Servo ringCatcher;
+    protected Servo tseRotateServo;
+    protected CRServo tseExtendServo;
 
     // Sensors
     protected BNO055IMU imu;
@@ -131,10 +81,6 @@ public abstract class CCHardwareBot {
      */
     private BoKHardwareStatus initMotorsAndSensors() {
         //Motors
-        /**wobbleGoalArm = opMode.hardwareMap.dcMotor.get(WOBBLE_GOAL_ARM);
-        if(wobbleGoalArm == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }*/
         frontIntake = opMode.hardwareMap.dcMotor.get(FRONT_INTAKE_MOTOR);
         if(frontIntake == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
@@ -147,97 +93,24 @@ public abstract class CCHardwareBot {
         if(linearLift == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        /**shooter = opMode.hardwareMap.dcMotor.get(SHOOTER_MOTOR);
-        if(shooter == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }*/
-    //    verticalIntake = opMode.hardwareMap.dcMotor.get(VERTICAL_INTAKE_MOTOR);
-      //  if(verticalIntake == null){
-        //    return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        //}
-
         //Servos;
-       /* shooterServo = opMode.hardwareMap.servo.get(SHOOTER_SERVO);
-        if(shooterServo == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        gateServo = opMode.hardwareMap.servo.get(GATE_SERVO);
-        if(gateServo == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        */
         deliverServo = opMode.hardwareMap.servo.get(DELIVERY_SERVO);
         if(deliverServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-        /**wobbleClaw = opMode.hardwareMap.servo.get(WOBBLE_CLAW_SERVO);
-        if(wobbleClaw == null) {
+        tseExtendServo = opMode.hardwareMap.crservo.get(TSE_SERVO_EXTEND);
+        if(tseExtendServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-
-        intakeGate = opMode.hardwareMap.servo.get(INTAKE_GATE_SERVO);
-        if(intakeGate == null){
+        tseRotateServo = opMode.hardwareMap.servo.get(TSE_SERVO_ROTATE);
+        if(tseRotateServo == null){
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-
-        intakePlate = opMode.hardwareMap.servo.get(INTAKE_PLATE_SERVO);
-        if(intakePlate == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        transerFlick = opMode.hardwareMap.servo.get(TRANSFER_FLICK);
-        if(transerFlick == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-
-        wobbleGoalArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        */
         //Sensors
-
-
-
-     /**distanceBack = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_BACK);
-        if (distanceBack == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        distanceForward = opMode.hardwareMap.analogInput.get(DISTANCE_SENSOR_FRONT);
-        if (distanceForward == null) {
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }*/
-        /*ods = opMode.hardwareMap.opticalDistanceSensor.get(ODS_RING);
-        if(ods == null){
-            return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
-        }
-        */
-
-
-
-        //Dc Motor Init
-      //  liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-       // liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
-        // Servos initialization
-
-        /**if (!opMode.getClass().getName().contains("Tele")) {
-            wobbleClaw.setPosition(WOBBLE_GRIP);
-          //  ringCatcher.setPosition(RING_STOPPER_UP - 0.1);
-           // boxServo.setPosition(BOX_UP);
-           // gateServo.setPosition(FLICKER_OUT);
-        } else {
-            // Do nothing for Teleop so that the robot hardware does not move during
-            // initialization
-        }*/
-
         imu = opMode.hardwareMap.get(BNO055IMU.class, IMU_TOP);
         if (imu == null) {
             return BoKHardwareStatus.BOK_HARDWARE_FAILURE;
         }
-
-
-       // wobbleGoalArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-       // wobbleGoalArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         return BoKHardwareStatus.BOK_HARDWARE_SUCCESS;
     }
 

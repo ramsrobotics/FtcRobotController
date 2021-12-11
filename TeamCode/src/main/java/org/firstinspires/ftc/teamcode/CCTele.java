@@ -4,12 +4,16 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 public class CCTele {
 
@@ -57,19 +61,6 @@ public class CCTele {
           //  currentPosition = updatePosition(currentPosition);
            // opMode.telemetry.addData("Position: ", "x: " + currentPosition.x + " y: " + currentPosition.y);
             moveRobot();
-            /*
-            if(counter == 11){
-                robot.intakeGate.setPosition(robot.INTAKE_GATE_DOWN);
-                counter = 0;
-            }
-            if(robot.ods.getLightDetected() >= 0.4){
-                counter++;
-            }
-            else {
-                counter = 0;
-            }
-
-             */
             if (opMode.gamepad1.y) {
                 speedCoef = CCHardwareBot.SPEED_COEFF_SLOW;
                 counter = 0;
@@ -78,20 +69,16 @@ public class CCTele {
                 speedCoef = CCHardwareBot.SPEED_COEFF_FAST;
             }
 
-            if (opMode.gamepad2.a) {
-                //Three inches
-                liftTargetPosition = -180;
-            }
             if (opMode.gamepad2.x) {
                 //Middle platform
                 liftTargetPosition = -280;
             }
             if (opMode.gamepad2.y) {
                 //top platform
-                liftTargetPosition = -380;
+                liftTargetPosition = -550;
             }
             if (opMode.gamepad2.b) {
-                robot.deliverServo.setPosition(0);
+                robot.deliverServo.setPosition(0.3);
             }
 
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
@@ -172,56 +159,28 @@ public class CCTele {
 
             if(opMode.gamepad2.dpad_left){
                 //TSE Up
-                //robot.deliverServo.setPosition(robot.deliverServo.getPosition() + 0.01);
+                robot.tseRotateServo.setPosition(robot.tseRotateServo.getPosition() + 0.006);
             }
             if(opMode.gamepad2.dpad_right){
                 //TSE Down
-                //robot.deliverServo.setPosition(robot.deliverServo.getPosition() - 0.01);
+                robot.tseRotateServo.setPosition(robot.tseRotateServo.getPosition() - 0.006);
             }
-            if(opMode.gamepad2.left_bumper){
-                //The big extension
-                //robot.deliverServo.setPosition();
+            if (opMode.gamepad2.a) {
+                //Three inches
+                robot.tseExtendServo.setDirection(FORWARD);
+                robot.tseExtendServo.setPower(1);
+            } else if (opMode.gamepad2.left_bumper) {
+                robot.tseExtendServo.setDirection(REVERSE);
+                robot.tseExtendServo.setPower(1);
+            } else {
+                robot.tseExtendServo.setDirection(REVERSE);
+                robot.tseExtendServo.setPower(0.394);
             }
             opMode.telemetry.update();
         }
 
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
-    //private CCPoint updatePosition(CCPoint last_point){
-        //meter/s^2 to in/s^2
-        //radians to degrees
-       // runTime.reset();
-        //double acceleration = robot.imu.getLinearAcceleration().yAccel*39.3701;
-        //if(acceleration< 2 && acceleration > -2){
-          //  acceleration = 0;
-        //}
-        //Log.v("BOK", "    ");
-        //Log.v("BOK", "accel: " + robot.imu.getLinearAcceleration().yAccel);
-        /**double theta = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
-                AxesOrder.XYZ,
-                AngleUnit.DEGREES).thirdAngle;
-        if(theta < 1 && theta > -1){
-            theta = 0;
-        }
-        double accelerationX = acceleration * Math.sin(theta/57.296);
-        double accelerationY = acceleration * Math.cos(theta/57.296);
-
-        if(accelerationX < 2 && accelerationX > -2){
-            accelerationX = 0;
-        }
-        if(accelerationY < 2 && accelerationX > -2){
-            accelerationY = 0;
-        }
-
-        double velocityX = accelerationX * runTime.seconds();
-        double velocityY = accelerationY * runTime.seconds();
-        Log.v("BOK", "accelX: " + accelerationX + " accelY: " + accelerationY + " theta: " + theta);
-        double x = last_point.x + last_point.velocityX*runTime.seconds() + (0.5*(accelerationX)*Math.pow(runTime.seconds(), 2));
-        double y = last_point.y + last_point.velocityY*runTime.seconds() + (0.5*(accelerationY)*Math.pow(runTime.seconds(), 2));
-        Log.v("BOK", "\n X: " + x + " Y: " + y);
-        runTime.reset();
-        return new CCPoint(x, y, theta, velocityX, velocityY, accelerationX, accelerationY, acceleration);*/
-    //}
     private void moveRobot() {
         robot.moveRobotTele(speedCoef);
     }
