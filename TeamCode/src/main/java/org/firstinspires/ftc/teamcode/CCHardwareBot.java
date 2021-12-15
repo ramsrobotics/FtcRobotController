@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
+import android.content.Context;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.ftccommon.SoundPlayer;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -119,6 +121,17 @@ public abstract class CCHardwareBot {
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imu.initialize(parameters);
+    }
+
+    private int audioID;
+    private Context appContext;
+    protected void initAudio(String name) {
+        audioID = opMode.hardwareMap.appContext.getResources().getIdentifier(name, "raw", opMode.hardwareMap.appContext.getPackageName());
+        appContext = opMode.hardwareMap.appContext;
+    }
+    protected void sound(String name) {
+        initAudio(name);
+        SoundPlayer.getInstance().startPlaying(appContext, audioID);
     }
 
     // Initialization of drive train is protected but abstract

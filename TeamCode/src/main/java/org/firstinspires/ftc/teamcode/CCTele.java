@@ -2,10 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
+import android.content.Context;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.ftccommon.SoundPlayer;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -14,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+import static java.lang.Thread.sleep;
 
 public class CCTele {
 
@@ -33,7 +37,10 @@ public class CCTele {
     boolean next = false;
     boolean shooterManualControl = false;
     boolean transfer = false;
+    boolean soundDebounce = false;
     double shooterPwr = .95;
+    boolean quackDebounce = false;
+    boolean bassDebounce = false;
 
     protected ElapsedTime runTime = new ElapsedTime();
 
@@ -46,6 +53,7 @@ public class CCTele {
         robot.setModeForDTMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.initializeImu();
         robot.linearLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //robot.quack();
 
         return BoKTeleStatus.BOK_TELE_SUCCESS;
     }
@@ -78,7 +86,14 @@ public class CCTele {
                 liftTargetPosition = -550;
             }
             if (opMode.gamepad2.b) {
+                if (robot.deliverServo.getPosition() >= 0.6 && !soundDebounce) {
+                    soundDebounce = true;
+                }
                 robot.deliverServo.setPosition(0.3);
+            }
+            if (soundDebounce && robot.deliverServo.getPosition() >= 0.6){
+                soundDebounce = false;
+                robot.sound("slip");
             }
 
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
@@ -93,16 +108,22 @@ public class CCTele {
                 robot.deliverServo.setPosition(1);
             }
             if (opMode.gamepad2.left_trigger != 0){
-                robot.deliverServo.setPosition(0.6);
+                robot.deliverServo.setPosition(0.7);
             }
             if(opMode.gamepad2.right_trigger > 0){
                 robot.carouSpinner.setPower(0.5);
+                quackDebounce = true;
             }
             if (opMode.gamepad2.right_bumper) {
                 robot.carouSpinner.setPower(-0.5);
+                quackDebounce = true;
             }
             if(opMode.gamepad2.right_trigger == 0 && !opMode.gamepad2.right_bumper){
                 robot.carouSpinner.setPower(0);
+                if (quackDebounce){
+                    quackDebounce = false;
+                    robot.sound("quack");
+                }
             }
             if (opMode.gamepad2.right_stick_y > GAME_TRIGGER_DEAD_ZONE) { //down
                 downFinished = false;
@@ -141,8 +162,14 @@ public class CCTele {
             }
             if(downFinished) {
                 robot.deliverServo.setPosition(1);
+                robot.sound("anvil");
+            }
+            if (bassDebounce && robot.linearLift.getCurrentPosition() > -20){
+                bassDebounce = false;
+                robot.sound("bass");
             }
             if(opMode.gamepad2.right_stick_button){
+                bassDebounce = true;
                 opMode.telemetry.addData("CC", "Lift: " + robot.linearLift.getCurrentPosition());
                 liftTargetPosition = -50;
             }
@@ -159,14 +186,13 @@ public class CCTele {
 
             if(opMode.gamepad2.dpad_left){
                 //TSE Up
-                robot.tseRotateServo.setPosition(robot.tseRotateServo.getPosition() + 0.006);
+                robot.tseRotateServo.setPosition(robot.tseRotateServo.getPosition() + 0.012);
             }
             if(opMode.gamepad2.dpad_right){
                 //TSE Down
-                robot.tseRotateServo.setPosition(robot.tseRotateServo.getPosition() - 0.006);
+                robot.tseRotateServo.setPosition(robot.tseRotateServo.getPosition() - 0.012);
             }
             if (opMode.gamepad2.a) {
-                //Three inches
                 robot.tseExtendServo.setDirection(FORWARD);
                 robot.tseExtendServo.setPower(1);
             } else if (opMode.gamepad2.left_bumper) {
@@ -176,6 +202,7 @@ public class CCTele {
                 robot.tseExtendServo.setDirection(REVERSE);
                 robot.tseExtendServo.setPower(0.394);
             }
+
             opMode.telemetry.update();
         }
 
