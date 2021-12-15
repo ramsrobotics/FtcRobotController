@@ -88,12 +88,12 @@ public class CCTele {
             if (opMode.gamepad2.b) {
                 if (robot.deliverServo.getPosition() >= 0.6 && !soundDebounce) {
                     soundDebounce = true;
+                    robot.sound("slip");
                 }
                 robot.deliverServo.setPosition(0.3);
             }
             if (soundDebounce && robot.deliverServo.getPosition() >= 0.6){
                 soundDebounce = false;
-                robot.sound("slip");
             }
 
             if (opMode.gamepad2.left_stick_y > GAME_TRIGGER_DEAD_ZONE){
@@ -152,6 +152,7 @@ public class CCTele {
                     //robot.linearLift.setPower(0);
                     if(robot.linearLift.getCurrentPosition() >= -45) {
                         downFinished = true;
+                        robot.sound("anvil");
                     }
                }
             }
@@ -162,14 +163,15 @@ public class CCTele {
             }
             if(downFinished) {
                 robot.deliverServo.setPosition(1);
-                robot.sound("anvil");
             }
-            if (bassDebounce && robot.linearLift.getCurrentPosition() > -20){
+            if (bassDebounce && robot.linearLift.getCurrentPosition() < -40){
                 bassDebounce = false;
-                robot.sound("bass");
             }
             if(opMode.gamepad2.right_stick_button){
-                bassDebounce = true;
+                if (!bassDebounce && robot.linearLift.getCurrentPosition() > -20) {
+                    bassDebounce = true;
+                    robot.sound("bass");
+                }
                 opMode.telemetry.addData("CC", "Lift: " + robot.linearLift.getCurrentPosition());
                 liftTargetPosition = -50;
             }
