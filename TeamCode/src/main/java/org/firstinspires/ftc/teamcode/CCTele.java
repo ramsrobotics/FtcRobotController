@@ -164,11 +164,11 @@ public class CCTele {
             if(downFinished) {
                 robot.deliverServo.setPosition(1);
             }
-            if (bassDebounce && robot.linearLift.getCurrentPosition() < -40){
+            if (bassDebounce && robot.linearLift.getCurrentPosition() < -35){
                 bassDebounce = false;
             }
             if(opMode.gamepad2.right_stick_button){
-                if (!bassDebounce && robot.linearLift.getCurrentPosition() > -20) {
+                if (!bassDebounce && robot.linearLift.getCurrentPosition() > -25) {
                     bassDebounce = true;
                     robot.sound("bass");
                 }
